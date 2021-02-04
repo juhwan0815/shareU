@@ -3,10 +3,11 @@ package inu.project.shareu.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Member extends BaseEntity {
@@ -17,23 +18,42 @@ public class Member extends BaseEntity {
     private Long id;
 
     @Column(unique = true,updatable = false,nullable = false)
-    private String email;
+    private int studentNumber;
 
     @Column(nullable = false)
     private String password;
 
     @Column(unique = true,nullable = false)
-    private String nickName;
+    private String name;
 
     @Column(nullable = false)
     private int currentPoint;
 
-    private String role;
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
+    private List<Role> roles = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
 
+    public Member(int studentNumber, String password, String name) {
+        this.studentNumber = studentNumber;
+        this.password = password;
+        this.name = name;
+        this.currentPoint = 10;
+        this.memberStatus = MemberStatus.ACTIVITY;
+    }
 
+    public static Member createMember(int studentNumber, String password, String name){
+        Member member = new Member(studentNumber,password,name);
+        return member;
+    }
 
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeName(String name){
+        this.name = name;
+    }
 
 }
