@@ -1,6 +1,8 @@
 package inu.project.shareu.advice;
 
 import inu.project.shareu.advice.exception.AuthenticationEntryPointException;
+import inu.project.shareu.advice.exception.ItemException;
+import inu.project.shareu.advice.exception.MajorException;
 import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.model.response.common.ExceptionResponse;
 import org.springframework.http.HttpStatus;
@@ -12,7 +14,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvice {
 
-    @ExceptionHandler(MemberException.class)
+    @ExceptionHandler({
+            MemberException.class,
+            MajorException.class,
+            ItemException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){
         ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());

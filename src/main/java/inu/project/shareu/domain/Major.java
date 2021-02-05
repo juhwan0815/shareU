@@ -19,4 +19,14 @@ public class Major extends BaseEntity{
     @Column(nullable = false,unique = true)
     private String majorName;
 
+    public static Major createMajor(String majorName){
+        Major major = Major.builder()
+                .majorName(majorName)
+                .build();
+        return major;
+    }
+
+    public void changeMajorName(String majorName) {
+        this.majorName = majorName;
+    }
 }

@@ -1,10 +1,10 @@
 package inu.project.shareu.service;
 
+import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,6 +29,6 @@ public class MemberDetailService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());
 
-        return new User(findMember.getName(), findMember.getPassword(), authorities);
+        return new LoginMember(findMember.getId(), findMember.getName(), findMember.getPassword(), authorities);
     }
 }

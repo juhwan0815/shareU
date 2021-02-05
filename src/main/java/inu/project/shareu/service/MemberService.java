@@ -1,7 +1,6 @@
 package inu.project.shareu.service;
 
 import inu.project.shareu.advice.exception.MemberException;
-import inu.project.shareu.config.security.JwtTokenProvider;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.MemberStatus;
 import inu.project.shareu.domain.Role;
@@ -15,14 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -43,7 +37,6 @@ public class MemberService {
         if(memberRepository.findByName(memberSaveDto.getName()).isPresent()){
             throw new MemberException("이미 존재하는 닉네임입니다.");
         }
-
 
         Member member = Member.createMember(memberSaveDto.getStudentNumber(),
                 passwordEncoder.encode(memberSaveDto.getPassword()),

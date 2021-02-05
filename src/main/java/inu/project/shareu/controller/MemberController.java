@@ -1,6 +1,7 @@
 package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.JwtTokenProvider;
+import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.model.request.member.MemberLoginDto;
 import inu.project.shareu.model.request.member.MemberSaveDto;
@@ -11,6 +12,8 @@ import inu.project.shareu.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,24 +51,36 @@ public class MemberController {
         return ResponseEntity.ok(memberLoginResponseDto);
     }
 
-    @PatchMapping("/members/{id}/changepassword")
-    public ResponseEntity changePassword(@ModelAttribute MemberUpdatePasswordDto memberUpdatePasswordDto,
-                                         @PathVariable Long id) {
+    @PatchMapping("/members/changepassword")
+    public ResponseEntity changePassword(@ModelAttribute MemberUpdatePasswordDto memberUpdatePasswordDto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        Long id = loginMember.getId();
+
         memberService.changePassword(id,memberUpdatePasswordDto);
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/member/{id}/changename")
-    public ResponseEntity changeName(@ModelAttribute MemberUpdateNameDto memberUpdateNameDto,
-                                     @PathVariable Long id){
-        memberService.changeName(id,memberUpdateNameDto);
+    @PatchMapping("/members/changename")
+    public ResponseEntity changeName(@ModelAttribute MemberUpdateNameDto memberUpdateNameDto){
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        Long id = loginMember.getId();
+
+        memberService.changeName(id,memberUpdateNameDto);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/members/{id}")
-    public ResponseEntity removeMember(@PathVariable Long id){
+    @DeleteMapping("/members")
+    public ResponseEntity removeMember(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        Long id = loginMember.getId();
+
         memberService.removeMember(id);
 
         return ResponseEntity.ok().build();
