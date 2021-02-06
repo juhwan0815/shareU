@@ -1,9 +1,6 @@
 package inu.project.shareu.advice;
 
-import inu.project.shareu.advice.exception.AuthenticationEntryPointException;
-import inu.project.shareu.advice.exception.ItemException;
-import inu.project.shareu.advice.exception.MajorException;
-import inu.project.shareu.advice.exception.MemberException;
+import inu.project.shareu.advice.exception.*;
 import inu.project.shareu.model.response.common.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,7 +14,8 @@ public class ExceptionAdvice {
     @ExceptionHandler({
             MemberException.class,
             MajorException.class,
-            ItemException.class
+            ItemException.class,
+            ReviewException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){

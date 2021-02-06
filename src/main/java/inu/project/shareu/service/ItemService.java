@@ -42,6 +42,8 @@ public class ItemService {
                 findMember,
                 major);
 
+        // TODO 아이템에서 storeList null 여부 체크
+
         itemRepository.save(item);
     }
 

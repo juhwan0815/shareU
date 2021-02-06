@@ -29,5 +29,34 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    public Review(String reviewContents,Boolean recommend,Item item, Member member) {
+        this.reviewContents = reviewContents;
+        this.item = item;
+        this.member = member;
 
+        if(recommend){
+            this.status = ReviewStatus.GOOD;
+        }else{
+            this.status = ReviewStatus.BAD;
+        }
+
+    }
+
+    public static Review createReview(String reviewContents, Boolean recommend,
+                                      Item item, Member member){
+        Review review = new Review(reviewContents,recommend,item,member);
+        return review;
+    }
+
+
+    public void updateReview(String reviewContents, Boolean recommend) {
+
+        if(recommend){
+            this.status = ReviewStatus.GOOD;
+        }else{
+            this.status = ReviewStatus.BAD;
+        }
+
+        this.reviewContents = reviewContents;
+    }
 }
