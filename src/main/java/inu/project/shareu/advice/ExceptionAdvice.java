@@ -15,14 +15,16 @@ public class ExceptionAdvice {
             MemberException.class,
             MajorException.class,
             ItemException.class,
-            ReviewException.class
+            ReviewException.class,
+            CartException.class,
+            OrderException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){
         ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
         return exceptionResponse;
     }
-
+    
     @ExceptionHandler(AuthenticationEntryPointException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ExceptionResponse exceptionResponse(AuthenticationEntryPointException e){

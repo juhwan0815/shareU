@@ -19,4 +19,9 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
 
     @Query("select distinct m from Member m join fetch m.roles where m.studentNumber = :studentNumber")
     Optional<Member> findWithRoleByStudentNumber(@Param("studentNumber") int studentNumber);
+
+    @Query("select distinct m from Member m left join fetch m.carts where m.id = :memberId")
+    Optional<Member> findWithCartById(@Param("memberId") Long memberId);
+
+
 }

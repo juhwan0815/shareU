@@ -29,4 +29,29 @@ public class Cart extends BaseEntity{
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    public static Cart createCart(Member member,Item item){
+        Cart cart = Cart.builder()
+                .cartStatus(CartStatus.CART)
+                .member(member)
+                .item(item)
+                .orderPrice(item.getPrice())
+                .build();
+
+        return cart;
+    }
+
+    public void order(Order order){
+        this.order = order;
+        order.getCarts().add(this);
+        this.cartStatus = CartStatus.ORDER;
+
+
+    }
+
+
+
 }

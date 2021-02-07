@@ -4,6 +4,10 @@ import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.model.request.item.ItemSaveRequest;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
 import inu.project.shareu.service.ItemService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Api(tags = "2.족보")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +23,11 @@ public class ItemController {
 
     private final ItemService itemService;
 
+    @ApiOperation(value = "족보 등록",notes = "족보 등록")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
     @PostMapping("/items")
     public ResponseEntity saveItem(@ModelAttribute ItemSaveRequest itemSaveRequest){
 
@@ -30,6 +40,11 @@ public class ItemController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation(value = "족보 수정",notes = "족보 수정")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
     @PatchMapping("/items/{id}")
     public ResponseEntity updateItem(@PathVariable("id") Long itemId,
                                      @ModelAttribute ItemUpdateRequest itemUpdateRequest){
@@ -43,6 +58,11 @@ public class ItemController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation(value = "족보 삭제",notes = "족보 삭제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
     @DeleteMapping("/items/{id}")
     public ResponseEntity deleteItem(@PathVariable("id") Long itemId){
 

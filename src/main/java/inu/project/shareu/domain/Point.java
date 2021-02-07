@@ -1,6 +1,5 @@
 package inu.project.shareu.domain;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,4 +19,27 @@ public class Point extends BaseEntity {
     private String pointContents;
 
     private int changePoint;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    public static Point createPoint(String pointContents,int changePoint,
+                                    Item item,Member member){
+        Point point = Point.builder()
+                .pointContents(pointContents)
+                .changePoint(changePoint)
+                .item(item)
+                .member(member)
+                .build();
+
+        member.changePoint(changePoint);
+
+        return point;
+    }
+
 }

@@ -2,18 +2,19 @@ package inu.project.shareu.service;
 
 import inu.project.shareu.advice.exception.ItemException;
 import inu.project.shareu.advice.exception.MemberException;
+import inu.project.shareu.advice.exception.OrderException;
 import inu.project.shareu.advice.exception.ReviewException;
-import inu.project.shareu.domain.Item;
-import inu.project.shareu.domain.Member;
-import inu.project.shareu.domain.Review;
+import inu.project.shareu.domain.*;
 import inu.project.shareu.model.request.review.ReviewSaveRequest;
 import inu.project.shareu.model.request.review.ReviewUpdateRequest;
-import inu.project.shareu.repository.ItemRepository;
-import inu.project.shareu.repository.MemberRepository;
-import inu.project.shareu.repository.ReviewRepository;
+import inu.project.shareu.repository.*;
+import inu.project.shareu.repository.query.OrderQueryRepository;
+import inu.project.shareu.repository.query.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,9 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
+    private final PointRepository pointRepository;
+    private final OrderQueryRepository orderQueryRepository;
+    private final ReviewQueryRepository reviewQueryRepository;
 
     @Transactional
     public void saveReview(Long memberId, ReviewSaveRequest reviewSaveRequest) {
@@ -31,16 +35,26 @@ public class ReviewService {
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Item item = itemRepository.findById(reviewSaveRequest.getItemId())
-                .orElseThrow(() -> new ItemException("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
 
-        // TODO 한명은 상품에 한개의 리뷰만 작성 가능
-        // TODO 상품 구매 여부 확인 로직 필요
+        List<Order> orders = orderQueryRepository.findOrderWithCartByMemberAndItem(findMember, item);
+        if(orders.isEmpty()){
+            throw new OrderException("족보에 대한 리뷰를 작성할 수 없습니다.");
+        }
+
+        List<Review> reviews= reviewQueryRepository.findReviewByMemberAndItem(findMember, item);
+        if(!reviews.isEmpty()){
+            throw new ReviewException("이미 족보에 대한 리뷰를 작성하였습니다.");
+        }
 
         Review review = Review.createReview(reviewSaveRequest.getReviewContents(),
                 reviewSaveRequest.getRecommend(),
                 item, findMember);
 
+        Point point = Point.createPoint("리뷰 등록", 3, item, findMember);
+
         reviewRepository.save(review);
+        pointRepository.save(point);
     }
 
     @Transactional

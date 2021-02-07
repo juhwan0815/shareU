@@ -35,6 +35,10 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
 
+    @OneToMany(mappedBy = "member")
+    private List<Cart> carts = new ArrayList<>();
+
+
     public Member(int studentNumber, String password, String name) {
         this.studentNumber = studentNumber;
         this.password = password;
@@ -56,4 +60,7 @@ public class Member extends BaseEntity {
         this.name = name;
     }
 
+    public void changePoint(int changePoint) {
+        this.currentPoint += changePoint;
+    }
 }
