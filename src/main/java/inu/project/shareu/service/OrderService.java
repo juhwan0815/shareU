@@ -78,8 +78,6 @@ public class OrderService {
 
         pointRepository.save(point);
         orderRepository.save(order);
-
-
     }
 
 }

@@ -3,7 +3,7 @@ package inu.project.shareu.model.request.member;
 import lombok.Data;
 
 @Data
-public class MemberUpdateNameDto {
+public class MemberUpdateNameRequest {
 
     private String name;
 }

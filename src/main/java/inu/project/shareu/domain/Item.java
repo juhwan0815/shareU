@@ -8,9 +8,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Item extends BaseEntity{
 
     @Id
@@ -25,10 +23,6 @@ public class Item extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private ItemStatus itemstatus;
 
-    private String className;
-
-    private String professor;
-
     private int price;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,31 +33,29 @@ public class Item extends BaseEntity{
     @JoinColumn(name = "major_id")
     private Major major;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id")
+    private Lecture lecture;
+
     @OneToMany(mappedBy = "item")
     private List<Store> storeList = new ArrayList<>();
 
-    public static Item createItem(String title,String itemContents,
-                                  String className,String professor,
+    public static Item createItem(String title,String itemContents,Lecture lecture,
                                   Member member,Major major){
-        Item item = Item.builder()
-                .title(title)
-                .itemContents(itemContents)
-                .className(className)
-                .professor(professor)
-                .itemstatus(ItemStatus.SALE)
-                .price(3)
-                .member(member)
-                .major(major)
-                .build();
+        Item item = new Item();
+        item.title = title;
+        item.itemContents = itemContents;
+        item.lecture = lecture ;
+        item.itemstatus = ItemStatus.SALE;
+        item.price = 3;
+        item.major = major;
+        item.member = member;
         return item;
     }
 
-    public void updateItem(String title,String itemContents,
-                           String className,String professor){
+    public void updateItem(String title,String itemContents){
         this.title = title;
         this.itemContents = itemContents;
-        this.className = className;
-        this.professor = professor;
     }
 
     public void deleteItem(){

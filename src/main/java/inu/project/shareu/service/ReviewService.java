@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,8 @@ public class ReviewService {
     private final PointRepository pointRepository;
     private final OrderQueryRepository orderQueryRepository;
     private final ReviewQueryRepository reviewQueryRepository;
+    private final BadWordRepository badWordRepository;
+    private final BadWordService badWordService;
 
     @Transactional
     public void saveReview(Long memberId, ReviewSaveRequest reviewSaveRequest) {
@@ -46,6 +49,13 @@ public class ReviewService {
         if(!reviews.isEmpty()){
             throw new ReviewException("이미 족보에 대한 리뷰를 작성하였습니다.");
         }
+
+        List<String> forbiddenWords = badWordRepository.findAll().stream()
+                .map(badWord -> badWord.getWord())
+                .collect(Collectors.toList());
+
+        badWordService.checkForbiddenWord(reviewSaveRequest.getReviewContents(),forbiddenWords);
+
 
         Review review = Review.createReview(reviewSaveRequest.getReviewContents(),
                 reviewSaveRequest.getRecommend(),
@@ -67,6 +77,13 @@ public class ReviewService {
         if(!findReview.getMember().getId().equals(memberId)){
             throw new MemberException("리뷰의 작성자가 아닙니다.");
         }
+
+        List<String> forbiddenWords = badWordRepository.findAll().stream()
+                .map(badWord -> badWord.getWord())
+                .collect(Collectors.toList());
+
+        badWordService.checkForbiddenWord(reviewUpdateRequest.getReviewContents(),forbiddenWords);
+
 
         findReview.updateReview(reviewUpdateRequest.getReviewContents(),
                 reviewUpdateRequest.getRecommend());

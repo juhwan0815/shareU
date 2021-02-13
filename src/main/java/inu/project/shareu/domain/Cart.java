@@ -6,9 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Cart extends BaseEntity{
 
     @Id
@@ -34,13 +32,11 @@ public class Cart extends BaseEntity{
     private Item item;
 
     public static Cart createCart(Member member,Item item){
-        Cart cart = Cart.builder()
-                .cartStatus(CartStatus.CART)
-                .member(member)
-                .item(item)
-                .orderPrice(item.getPrice())
-                .build();
-
+        Cart cart = new Cart();
+        cart.cartStatus = CartStatus.CART;
+        cart.member = member;
+        cart.item = item;
+        cart.orderPrice = item.getPrice();
         return cart;
     }
 
@@ -48,7 +44,6 @@ public class Cart extends BaseEntity{
         this.order = order;
         order.getCarts().add(this);
         this.cartStatus = CartStatus.ORDER;
-
 
     }
 

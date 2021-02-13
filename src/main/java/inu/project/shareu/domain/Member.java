@@ -9,7 +9,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Member extends BaseEntity {
 
     @Id
@@ -38,17 +37,13 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Cart> carts = new ArrayList<>();
 
-
-    public Member(int studentNumber, String password, String name) {
-        this.studentNumber = studentNumber;
-        this.password = password;
-        this.name = name;
-        this.currentPoint = 10;
-        this.memberStatus = MemberStatus.ACTIVITY;
-    }
-
     public static Member createMember(int studentNumber, String password, String name){
-        Member member = new Member(studentNumber,password,name);
+        Member member = new Member();
+        member.studentNumber =studentNumber;
+        member.password = password;
+        member.name = name;
+        member.currentPoint = 10;
+        member.memberStatus = MemberStatus.ACTIVITY;
         return member;
     }
 

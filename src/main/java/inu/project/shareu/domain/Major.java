@@ -6,10 +6,8 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-public class Major extends BaseEntity{
+public class Major{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +17,14 @@ public class Major extends BaseEntity{
     @Column(nullable = false,unique = true)
     private String majorName;
 
-    public static Major createMajor(String majorName){
-        Major major = Major.builder()
-                .majorName(majorName)
-                .build();
+    @ManyToOne
+    @JoinColumn(name = "college_id")
+    private College college;
+
+    public static Major createMajor(String majorName,College college){
+        Major major = new Major();
+        major.majorName = majorName;
+        major.college = college;
         return major;
     }
 

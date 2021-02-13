@@ -29,22 +29,19 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Review(String reviewContents,Boolean recommend,Item item, Member member) {
-        this.reviewContents = reviewContents;
-        this.item = item;
-        this.member = member;
-
-        if(recommend){
-            this.status = ReviewStatus.GOOD;
-        }else{
-            this.status = ReviewStatus.BAD;
-        }
-
-    }
-
     public static Review createReview(String reviewContents, Boolean recommend,
                                       Item item, Member member){
-        Review review = new Review(reviewContents,recommend,item,member);
+        Review review = new Review();
+        review.reviewContents =reviewContents;
+        review.item = item;
+        review.member = member;
+
+        if(recommend){
+            review.status = ReviewStatus.GOOD;
+        }else {
+            review.status = ReviewStatus.BAD;
+        }
+
         return review;
     }
 

@@ -6,9 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Role {
 
     @Id
@@ -23,9 +21,14 @@ public class Role {
     private Member member;
 
     public static Role createRole(){
-        Role role = Role.builder()
-                .roleName("ROLE_MEMBER")
-                .build();
+        Role role = new Role();
+        role.roleName = "ROLE_MEMBER";
+        return role;
+    }
+
+    public static Role createAdminRole(){
+        Role role = new Role();
+        role.roleName = "ROLE_ADMIN";
         return role;
     }
 

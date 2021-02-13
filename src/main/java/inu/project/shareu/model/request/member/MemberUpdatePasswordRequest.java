@@ -3,7 +3,7 @@ package inu.project.shareu.model.request.member;
 import lombok.Data;
 
 @Data
-public class MemberUpdatePasswordDto {
+public class MemberUpdatePasswordRequest {
 
     private String currentPassword;
 

@@ -1,13 +1,14 @@
 package inu.project.shareu.service;
 
 import inu.project.shareu.advice.exception.MemberException;
+import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.MemberStatus;
 import inu.project.shareu.domain.Role;
-import inu.project.shareu.model.request.member.MemberLoginDto;
-import inu.project.shareu.model.request.member.MemberSaveDto;
-import inu.project.shareu.model.request.member.MemberUpdateNameDto;
-import inu.project.shareu.model.request.member.MemberUpdatePasswordDto;
+import inu.project.shareu.model.request.member.MemberLoginRequest;
+import inu.project.shareu.model.request.member.MemberSaveRequest;
+import inu.project.shareu.model.request.member.MemberUpdateNameRequest;
+import inu.project.shareu.model.request.member.MemberUpdatePasswordRequest;
 import inu.project.shareu.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,19 +29,19 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void saveMember(MemberSaveDto memberSaveDto){
+    public void saveMember(MemberSaveRequest memberSaveRequest){
 
-        if(memberRepository.findByStudentNumber(memberSaveDto.getStudentNumber()).isPresent()){
+        if(memberRepository.findByStudentNumber(memberSaveRequest.getStudentNumber()).isPresent()){
             throw new MemberException("이미 가입한 학번입니다.");
         }
 
-        if(memberRepository.findByName(memberSaveDto.getName()).isPresent()){
+        if(memberRepository.findByName(memberSaveRequest.getName()).isPresent()){
             throw new MemberException("이미 존재하는 닉네임입니다.");
         }
 
-        Member member = Member.createMember(memberSaveDto.getStudentNumber(),
-                passwordEncoder.encode(memberSaveDto.getPassword()),
-                memberSaveDto.getName());
+        Member member = Member.createMember(memberSaveRequest.getStudentNumber(),
+                passwordEncoder.encode(memberSaveRequest.getPassword()),
+                memberSaveRequest.getName());
 
         Role role = Role.createRole();
         role.giveRoleToMember(member);
@@ -48,16 +49,16 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member loginMember(MemberLoginDto memberLoginDto) {
+    public Member loginMember(MemberLoginRequest memberLoginRequest) {
         Member findMember = memberRepository.findWithRoleByStudentNumber(
-                memberLoginDto.getStudentNumber())
+                memberLoginRequest.getStudentNumber())
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         if(findMember.getMemberStatus().equals(MemberStatus.BLOCK)){
             throw new MemberException("차단된 사용자입니다.");
         }
 
-        if(!passwordEncoder.matches(memberLoginDto.getPassword(),findMember.getPassword())){
+        if(!passwordEncoder.matches(memberLoginRequest.getPassword(),findMember.getPassword())){
             throw new MemberException("비밀번호가 일치하지 않습니다.");
         }
 
@@ -65,58 +66,58 @@ public class MemberService {
     }
 
     @Transactional
-    public void changePassword(Long id, MemberUpdatePasswordDto memberUpdatePasswordDto) {
-        Member findMember = memberRepository.findById(id)
+    public void changePassword(Long memberId, MemberUpdatePasswordRequest memberUpdatePasswordrequest) {
+        Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        LoginMember loginMember= (LoginMember) authentication.getPrincipal();
 
-        if(!findMember.getName().equals(user.getUsername())){
+        if(!findMember.getName().equals(loginMember.getUsername())){
             throw new MemberException("다른 회원의 정보를 변경할 수 없습니다.");
         }
 
-        if(!passwordEncoder.matches(memberUpdatePasswordDto.getCurrentPassword(), findMember.getPassword())){
+        if(!passwordEncoder.matches(memberUpdatePasswordrequest.getCurrentPassword(), findMember.getPassword())){
             throw new MemberException("비밀번호가 일치하지 않습니다.");
         }
 
-        if(!memberUpdatePasswordDto.getChangePassword1().equals(memberUpdatePasswordDto.getChangePassword2())){
+        if(!memberUpdatePasswordrequest.getChangePassword1().equals(memberUpdatePasswordrequest.getChangePassword2())){
             throw new MemberException("변경될 패스워드가 일치하지 않습니다.");
         }
 
-        findMember.changePassword(passwordEncoder.encode(memberUpdatePasswordDto.getChangePassword1()));
+        findMember.changePassword(passwordEncoder.encode(memberUpdatePasswordrequest.getChangePassword1()));
     }
 
 
     @Transactional
-    public void changeName(Long id, MemberUpdateNameDto memberUpdateNameDto) {
-        Member findMember = memberRepository.findById(id)
+    public void changeName(Long memberId, MemberUpdateNameRequest memberUpdateNameRequest) {
+        Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        LoginMember loginMember  = (LoginMember) authentication.getPrincipal();
 
-        if(!findMember.getName().equals(user.getUsername())){
+        if(!findMember.getName().equals(loginMember.getUsername())){
             throw new MemberException("다른 회원의 정보를 변경할 수 없습니다.");
         }
 
-        if(memberRepository.findByName(memberUpdateNameDto.getName()).isPresent()){
+        if(memberRepository.findByName(memberUpdateNameRequest.getName()).isPresent()){
             throw new MemberException("이미 존재하는 닉네임입니다.");
         }
 
-        findMember.changeName(memberUpdateNameDto.getName());
+        findMember.changeName(memberUpdateNameRequest.getName());
     }
 
 
     @Transactional
-    public void removeMember(Long id) {
-        Member findMember = memberRepository.findById(id)
+    public void removeMember(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
 
-        if(!findMember.getName().equals(user.getUsername())){
+        if(!findMember.getName().equals(loginMember.getUsername())){
             throw new MemberException("다른 회원을 탈퇴할 수 없습니다.");
         }
 

@@ -3,11 +3,11 @@ package inu.project.shareu.controller;
 import inu.project.shareu.config.security.JwtTokenProvider;
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.member.MemberLoginDto;
-import inu.project.shareu.model.request.member.MemberSaveDto;
-import inu.project.shareu.model.request.member.MemberUpdateNameDto;
-import inu.project.shareu.model.request.member.MemberUpdatePasswordDto;
-import inu.project.shareu.model.response.member.MemberLoginResponseDto;
+import inu.project.shareu.model.request.member.MemberLoginRequest;
+import inu.project.shareu.model.request.member.MemberSaveRequest;
+import inu.project.shareu.model.request.member.MemberUpdateNameRequest;
+import inu.project.shareu.model.request.member.MemberUpdatePasswordRequest;
+import inu.project.shareu.model.response.member.MemberLoginResponse;
 import inu.project.shareu.service.MemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -35,27 +35,27 @@ public class MemberController {
 
     @ApiOperation(value = "회원가입",notes = "회원 가입")
     @PostMapping("/members/signup")
-    public ResponseEntity saveMember(@ModelAttribute MemberSaveDto memberSaveDto) {
+    public ResponseEntity saveMember(@ModelAttribute MemberSaveRequest memberSaveRequest) {
 
-        memberService.saveMember(memberSaveDto);
+        memberService.saveMember(memberSaveRequest);
 
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation(value = "회원 로그인",notes = "회원 로그인")
     @PostMapping("/members/signin")
-    public ResponseEntity<MemberLoginResponseDto> loginMember(@ModelAttribute MemberLoginDto memberLoginDto) {
+    public ResponseEntity<MemberLoginResponse> loginMember(@ModelAttribute MemberLoginRequest memberLoginRequest) {
 
-        Member loginMember = memberService.loginMember(memberLoginDto);
+        Member loginMember = memberService.loginMember(memberLoginRequest);
 
         List<String> roles = new ArrayList<>();
         loginMember.getRoles().forEach(role -> roles.add(role.getRoleName()));
 
         String token = "Bearer "+jwtTokenProvider.createToken(String.valueOf(loginMember.getId()), roles);
 
-        MemberLoginResponseDto memberLoginResponseDto = new MemberLoginResponseDto(token);
+        MemberLoginResponse memberLoginResponse = new MemberLoginResponse(token);
 
-        return ResponseEntity.ok(memberLoginResponseDto);
+        return ResponseEntity.ok(memberLoginResponse);
     }
 
     @ApiOperation(value = "비밀번호 변경",notes = "회원 비밀번호 변경")
@@ -64,13 +64,13 @@ public class MemberController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/members/change-password")
-    public ResponseEntity changePassword(@ModelAttribute MemberUpdatePasswordDto memberUpdatePasswordDto) {
+    public ResponseEntity changePassword(@ModelAttribute MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long id = loginMember.getId();
+        Long memberId = loginMember.getId();
 
-        memberService.changePassword(id,memberUpdatePasswordDto);
+        memberService.changePassword(memberId,memberUpdatePasswordRequest);
 
         return ResponseEntity.ok().build();
     }
@@ -81,13 +81,13 @@ public class MemberController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/members/change-name")
-    public ResponseEntity changeName(@ModelAttribute MemberUpdateNameDto memberUpdateNameDto){
+    public ResponseEntity changeName(@ModelAttribute MemberUpdateNameRequest memberUpdateNameRequest){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long id = loginMember.getId();
+        Long memberId = loginMember.getId();
 
-        memberService.changeName(id,memberUpdateNameDto);
+        memberService.changeName(memberId,memberUpdateNameRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -101,9 +101,9 @@ public class MemberController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long id = loginMember.getId();
+        Long memberId = loginMember.getId();
 
-        memberService.removeMember(id);
+        memberService.removeMember(memberId);
 
         // TODO 회원 탈퇴시 족보, 구매, 장바구니 등등 모든 엔티티 삭제?
 

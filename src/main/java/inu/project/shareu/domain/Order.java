@@ -31,6 +31,7 @@ public class Order extends BaseEntity{
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<Cart> carts = new ArrayList<>();
 
+    // TODO 수정 예정
     public Order(Member member,List<Cart> carts) {
         this.member = member;
         this.orderStatus = OrderStatus.ORDER;

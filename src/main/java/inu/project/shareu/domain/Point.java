@@ -6,9 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Point extends BaseEntity {
 
     @Id
@@ -30,12 +28,11 @@ public class Point extends BaseEntity {
 
     public static Point createPoint(String pointContents,int changePoint,
                                     Item item,Member member){
-        Point point = Point.builder()
-                .pointContents(pointContents)
-                .changePoint(changePoint)
-                .item(item)
-                .member(member)
-                .build();
+        Point point = new Point();
+        point.pointContents = pointContents;
+        point.changePoint = changePoint;
+        point.item = item;
+        point.member = member;
 
         member.changePoint(changePoint);
 

@@ -12,8 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
 
 @Api(tags = "2.족보")
 @Slf4j
@@ -45,8 +48,8 @@ public class ItemController {
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header")
     })
-    @PatchMapping("/items/{id}")
-    public ResponseEntity updateItem(@PathVariable("id") Long itemId,
+    @PatchMapping("/items/{itemId}")
+    public ResponseEntity updateItem(@PathVariable Long itemId,
                                      @ModelAttribute ItemUpdateRequest itemUpdateRequest){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,8 +66,8 @@ public class ItemController {
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header")
     })
-    @DeleteMapping("/items/{id}")
-    public ResponseEntity deleteItem(@PathVariable("id") Long itemId){
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity deleteItem(@PathVariable Long itemId){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();

@@ -17,7 +17,10 @@ public class ExceptionAdvice {
             ItemException.class,
             ReviewException.class,
             CartException.class,
-            OrderException.class
+            OrderException.class,
+            CollegeException.class,
+            LectureException.class,
+            BadWordException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){
