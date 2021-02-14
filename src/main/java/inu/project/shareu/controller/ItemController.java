@@ -71,9 +71,8 @@ public class ItemController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
 
-        itemService.deleteItem(memberId,itemId);
+        itemService.deleteItem(loginMember,itemId);
 
         return ResponseEntity.ok().build();
     }

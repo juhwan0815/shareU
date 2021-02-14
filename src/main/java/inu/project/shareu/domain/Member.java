@@ -26,6 +26,9 @@ public class Member extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
+    private int count;
+
+    @Column(nullable = false)
     private int currentPoint;
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
@@ -42,6 +45,7 @@ public class Member extends BaseEntity {
         member.studentNumber =studentNumber;
         member.password = password;
         member.name = name;
+        member.count = 3;
         member.currentPoint = 10;
         member.memberStatus = MemberStatus.ACTIVITY;
         return member;
@@ -57,5 +61,25 @@ public class Member extends BaseEntity {
 
     public void changePoint(int changePoint) {
         this.currentPoint += changePoint;
+    }
+
+    public int changeCountAndPoint() {
+
+        int changePoint = 0;
+
+        count -= 1;
+
+        if(count == 0){
+            memberStatus = MemberStatus.BLOCK;
+        }
+        changePoint -= currentPoint;
+        currentPoint = 0;
+
+        return changePoint;
+    }
+
+    public void changeMemberStatus() {
+        this.memberStatus = MemberStatus.ACTIVITY;
+        this.count = 3;
     }
 }

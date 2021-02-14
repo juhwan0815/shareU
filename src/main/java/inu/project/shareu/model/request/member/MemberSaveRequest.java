@@ -8,7 +8,9 @@ public class MemberSaveRequest {
 
     private int studentNumber;
 
-    private String password;
+    private String password1;
+
+    private String password2;
 
     private String name;
 

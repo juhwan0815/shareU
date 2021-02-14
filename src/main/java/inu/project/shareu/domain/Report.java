@@ -14,7 +14,10 @@ public class Report extends BaseEntity {
     @Column(name = "report_id")
     private Long id;
 
-    private String ReportContents;
+    private String reportContents;
+
+    @Enumerated(EnumType.STRING)
+    private ReportStatus reportStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -27,4 +30,19 @@ public class Report extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
+
+    public static Report createReport(String reportContents,Item item,
+                                      Review review,Member member){
+        Report report = new Report();
+        report.item = item;
+        report.review = review;
+        report.member = member;
+        report.reportStatus = ReportStatus.WAIT;
+        report.reportContents = reportContents;
+        return report;
+    }
+
+    public void changeReportStatus() {
+        this.reportStatus = ReportStatus.FINISH;
+    }
 }

@@ -20,6 +20,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
+
+
     @Override
     public void doFilter(ServletRequest request,
                          ServletResponse response,
@@ -32,7 +34,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         chain.doFilter(request,response);
     }
 

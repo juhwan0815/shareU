@@ -62,4 +62,11 @@ public class Item extends BaseEntity{
         this.itemstatus = ItemStatus.STOP;
     }
 
+    public int deleteItemByAdmin() {
+
+        this.itemstatus = ItemStatus.STOP;
+        int changePoint = member.changeCountAndPoint();
+
+        return changePoint;
+    }
 }

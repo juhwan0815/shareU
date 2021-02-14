@@ -19,6 +19,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          HttpServletResponse response,
                          AuthenticationException authException)
             throws IOException, ServletException {
+
         response.sendRedirect("/exception/entrypoint");
     }
 }

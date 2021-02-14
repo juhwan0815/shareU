@@ -4,6 +4,7 @@ import inu.project.shareu.advice.exception.ItemException;
 import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.advice.exception.OrderException;
 import inu.project.shareu.advice.exception.ReviewException;
+import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.*;
 import inu.project.shareu.model.request.review.ReviewSaveRequest;
 import inu.project.shareu.model.request.review.ReviewUpdateRequest;
@@ -11,6 +12,7 @@ import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.OrderQueryRepository;
 import inu.project.shareu.repository.query.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +58,6 @@ public class ReviewService {
 
         badWordService.checkForbiddenWord(reviewSaveRequest.getReviewContents(),forbiddenWords);
 
-
         Review review = Review.createReview(reviewSaveRequest.getReviewContents(),
                 reviewSaveRequest.getRecommend(),
                 item, findMember);
@@ -90,15 +91,32 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long reviewId, Long memberId) {
+    public void deleteReview(Long reviewId, LoginMember loginMember) {
 
-        Review findReview = reviewRepository.findWithMemberById(reviewId)
+        Review findReview = reviewRepository.findWithMemberAndItemById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
-        if(!findReview.getMember().getId().equals(memberId)) {
-            throw new MemberException("리뷰의 작성자가 아닙니다.");
+        List<GrantedAuthority> adminRole = loginMember.getAuthorities().stream()
+                .filter(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))
+                .collect(Collectors.toList());
+
+        if(adminRole.isEmpty()){
+
+            if(!findReview.getMember().getId().equals(loginMember.getId())) {
+                throw new MemberException("리뷰의 작성자가 아닙니다.");
+            }
+            reviewRepository.delete(findReview);
+
+        }else {
+
+            int changePoint = findReview.getMember().changeCountAndPoint();
+            Point point = Point.createPoint("리뷰 신고로 인한 포인트 초기화 처리", changePoint,
+                    findReview.getItem(), findReview.getMember());
+
+            pointRepository.save(point);
+            reviewRepository.delete(findReview);
         }
 
-        reviewRepository.delete(findReview);
+
     }
 }

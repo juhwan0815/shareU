@@ -20,7 +20,8 @@ public class ExceptionAdvice {
             OrderException.class,
             CollegeException.class,
             LectureException.class,
-            BadWordException.class
+            BadWordException.class,
+            ReportException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){

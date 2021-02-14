@@ -47,6 +47,9 @@ public class Cart extends BaseEntity{
 
     }
 
-
+    public int cancel(){
+        this.cartStatus = CartStatus.CANCEL;
+        return orderPrice;
+    }
 
 }

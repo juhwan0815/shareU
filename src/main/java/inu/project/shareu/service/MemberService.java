@@ -39,8 +39,12 @@ public class MemberService {
             throw new MemberException("이미 존재하는 닉네임입니다.");
         }
 
+        if(!memberSaveRequest.getPassword1().equals(memberSaveRequest.getPassword2())){
+            throw new MemberException("패스워드가 일치하지 않습니다.");
+        }
+
         Member member = Member.createMember(memberSaveRequest.getStudentNumber(),
-                passwordEncoder.encode(memberSaveRequest.getPassword()),
+                passwordEncoder.encode(memberSaveRequest.getPassword1()),
                 memberSaveRequest.getName());
 
         Role role = Role.createRole();
@@ -122,5 +126,18 @@ public class MemberService {
         }
 
         memberRepository.delete(findMember);
+    }
+
+    @Transactional
+    public void changeMemberStatus(Long memberId) {
+
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
+
+        if(findMember.getMemberStatus().equals(MemberStatus.ACTIVITY)){
+            throw new MemberException("차단되지 않은 회원입니다.");
+        }
+
+        findMember.changeMemberStatus();
     }
 }

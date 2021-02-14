@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/exception")
 public class ExceptionController {
 
-    @GetMapping("/entrypoint")
+    // TODO 알수없다 머냐?
+    @RequestMapping("/entrypoint")
     public void entryPointException(){
         throw new AuthenticationEntryPointException("로그인이 필요한 서비스입니다.");
     }
 
-    @GetMapping("/accessdenied")
+    @RequestMapping("/accessdenied")
     public void accessDenied(){
         throw new AccessDeniedException("보유한 권한으로 접근할 수 없습니다.");
     }

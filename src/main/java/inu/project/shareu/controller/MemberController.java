@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = {"1.회원"})
 @Slf4j
@@ -106,6 +107,21 @@ public class MemberController {
         memberService.removeMember(memberId);
 
         // TODO 회원 탈퇴시 족보, 구매, 장바구니 등등 모든 엔티티 삭제?
+
+        return ResponseEntity.ok().build();
+    }
+
+    // TODO 차단 회원
+
+    @ApiOperation(value = "회원 차단 해제",notes = "회원 차단 해제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @PatchMapping("/members/{memberId}")
+    public ResponseEntity changeMemberStatus(@PathVariable Long memberId){
+
+       memberService.changeMemberStatus(memberId);
 
         return ResponseEntity.ok().build();
     }
