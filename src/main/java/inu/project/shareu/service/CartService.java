@@ -39,13 +39,16 @@ public class CartService {
             throw new ItemException("판매가 중지된 족보입니다.");
         }
 
-        List<Cart> carts = loginMember.getCarts();
+        // TODO 지연로딩 쿼리 나가는지 확인
+        if(loginMember.equals(item.getMember())){
+            throw new CartException("자신이 등록한 족보는 장바구니에 담을 수 없습니다.");
+        }
 
-        for (Cart cart : carts) {
+        loginMember.getCarts().forEach(cart -> {
             if(cart.getItem().equals(item)){
                 throw new CartException("이미 장바구니에 존재하거나 구매한 족보입니다.");
             }
-        }
+        });
 
         Cart cart = Cart.createCart(loginMember, item);
 

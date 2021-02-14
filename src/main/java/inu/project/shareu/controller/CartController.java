@@ -38,6 +38,7 @@ public class CartController {
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
         Long memberId = loginMember.getId();
 
+        // TODO 내가 등록한 상품은 안담기게 해야함
         cartService.saveCart(memberId,cartSaveRequest);
 
         return ResponseEntity.ok().build();

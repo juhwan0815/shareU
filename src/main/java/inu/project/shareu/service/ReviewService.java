@@ -43,12 +43,12 @@ public class ReviewService {
                 .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
 
         List<Order> orders = orderQueryRepository.findOrderWithCartByMemberAndItem(findMember, item);
-        if(orders.isEmpty()){
+        if (orders.isEmpty()) {
             throw new OrderException("족보에 대한 리뷰를 작성할 수 없습니다.");
         }
 
-        List<Review> reviews= reviewQueryRepository.findReviewByMemberAndItem(findMember, item);
-        if(!reviews.isEmpty()){
+        List<Review> reviews = reviewQueryRepository.findReviewByMemberAndItem(findMember, item);
+        if (!reviews.isEmpty()) {
             throw new ReviewException("이미 족보에 대한 리뷰를 작성하였습니다.");
         }
 
@@ -56,7 +56,7 @@ public class ReviewService {
                 .map(badWord -> badWord.getWord())
                 .collect(Collectors.toList());
 
-        badWordService.checkForbiddenWord(reviewSaveRequest.getReviewContents(),forbiddenWords);
+        badWordService.checkForbiddenWord(reviewSaveRequest.getReviewContents(), forbiddenWords);
 
         Review review = Review.createReview(reviewSaveRequest.getReviewContents(),
                 reviewSaveRequest.getRecommend(),
@@ -75,7 +75,7 @@ public class ReviewService {
         Review findReview = reviewRepository.findWithMemberById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
-        if(!findReview.getMember().getId().equals(memberId)){
+        if (!findReview.getMember().getId().equals(memberId)) {
             throw new MemberException("리뷰의 작성자가 아닙니다.");
         }
 
@@ -83,7 +83,7 @@ public class ReviewService {
                 .map(badWord -> badWord.getWord())
                 .collect(Collectors.toList());
 
-        badWordService.checkForbiddenWord(reviewUpdateRequest.getReviewContents(),forbiddenWords);
+        badWordService.checkForbiddenWord(reviewUpdateRequest.getReviewContents(), forbiddenWords);
 
 
         findReview.updateReview(reviewUpdateRequest.getReviewContents(),
@@ -100,20 +100,23 @@ public class ReviewService {
                 .filter(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))
                 .collect(Collectors.toList());
 
-        if(adminRole.isEmpty()){
+        if (adminRole.isEmpty()) {
 
-            if(!findReview.getMember().getId().equals(loginMember.getId())) {
+            if (!findReview.getMember().getId().equals(loginMember.getId())) {
                 throw new MemberException("리뷰의 작성자가 아닙니다.");
             }
             reviewRepository.delete(findReview);
 
-        }else {
+        } else {
 
-            int changePoint = findReview.getMember().changeCountAndPoint();
-            Point point = Point.createPoint("리뷰 신고로 인한 포인트 초기화 처리", changePoint,
-                    findReview.getItem(), findReview.getMember());
+            int changePoint = findReview.getMember().getChangePoint();
 
-            pointRepository.save(point);
+            if (findReview.getMember().getCurrentPoint() > 0) {
+                Point point = Point.createPoint("리뷰 신고로 인한 포인트 초기화 처리", changePoint,
+                        findReview.getItem(), findReview.getMember());
+                pointRepository.save(point);
+            }
+
             reviewRepository.delete(findReview);
         }
 

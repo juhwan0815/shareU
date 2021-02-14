@@ -97,22 +97,22 @@ public class ItemService {
         } else {
 
             int changePoint = item.deleteItemByAdmin();
-            Point point = Point.createPoint("족보 신고 처리로 인한 포인트 초기화", changePoint,
-                    item, item.getMember());
-            pointRepository.save(point);
 
-            // TODO 환불 검증 필요
+            if(item.getMember().getCurrentPoint() > 0) {
+                Point point = Point.createPoint("족보 신고 처리로 인한 포인트 초기화", changePoint,
+                        item, item.getMember());
+                pointRepository.save(point);
+            }
+
             List<Cart> carts = cartQueryRepository.findCartWithMemberByItemAndCartStatus(item);
 
             if(!carts.isEmpty()){
                 carts.forEach(cart -> {
                     int orderPrice = cart.cancel();
-                    cart.getMember().changePoint(orderPrice);
                     Point refundPoint = Point.createPoint("족보 신고 처리로 인한 환불", orderPrice,
                             item, cart.getMember());
                     pointRepository.save(refundPoint);
                 });
-
             }
         }
 

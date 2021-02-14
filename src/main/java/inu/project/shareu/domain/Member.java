@@ -16,13 +16,13 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(unique = true,updatable = false,nullable = false)
+    @Column(unique = true, updatable = false, nullable = false)
     private int studentNumber;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
     @Column(nullable = false)
@@ -31,7 +31,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private int currentPoint;
 
-    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Role> roles = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -40,9 +40,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Cart> carts = new ArrayList<>();
 
-    public static Member createMember(int studentNumber, String password, String name){
+    public static Member createMember(int studentNumber, String password, String name) {
         Member member = new Member();
-        member.studentNumber =studentNumber;
+        member.studentNumber = studentNumber;
         member.password = password;
         member.name = name;
         member.count = 3;
@@ -55,7 +55,7 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
-    public void changeName(String name){
+    public void changeName(String name) {
         this.name = name;
     }
 
@@ -63,23 +63,23 @@ public class Member extends BaseEntity {
         this.currentPoint += changePoint;
     }
 
-    public int changeCountAndPoint() {
-
+    public int getChangePoint() {
         int changePoint = 0;
-
-        count -= 1;
-
-        if(count == 0){
-            memberStatus = MemberStatus.BLOCK;
-        }
         changePoint -= currentPoint;
-        currentPoint = 0;
-
         return changePoint;
     }
 
     public void changeMemberStatus() {
         this.memberStatus = MemberStatus.ACTIVITY;
         this.count = 3;
+    }
+
+    public void changeCount() {
+        if (count > 0) {
+            count -= 1;
+        }
+        if (count == 0) {
+            memberStatus = MemberStatus.BLOCK;
+        }
     }
 }

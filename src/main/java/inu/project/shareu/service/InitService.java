@@ -82,7 +82,6 @@ public class InitService {
             College college18 = College.createCollege("군사학",CollegeStatus.교양);
             collegeRepository.save(college18);
 
-
         }
     }
 

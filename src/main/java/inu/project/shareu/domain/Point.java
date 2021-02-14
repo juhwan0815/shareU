@@ -26,7 +26,8 @@ public class Point extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public static Point createPoint(String pointContents,int changePoint,
+    public static Point
+    createPoint(String pointContents,int changePoint,
                                     Item item,Member member){
         Point point = new Point();
         point.pointContents = pointContents;

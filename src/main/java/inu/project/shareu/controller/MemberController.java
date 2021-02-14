@@ -71,6 +71,7 @@ public class MemberController {
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
         Long memberId = loginMember.getId();
 
+        // TODO 통합
         memberService.changePassword(memberId,memberUpdatePasswordRequest);
 
         return ResponseEntity.ok().build();

@@ -3,6 +3,7 @@ package inu.project.shareu.service;
 import inu.project.shareu.advice.exception.CartException;
 import inu.project.shareu.advice.exception.ItemException;
 import inu.project.shareu.advice.exception.MemberException;
+import inu.project.shareu.advice.exception.OrderException;
 import inu.project.shareu.domain.*;
 import inu.project.shareu.repository.ItemRepository;
 import inu.project.shareu.repository.MemberRepository;
@@ -62,17 +63,30 @@ public class OrderService {
             throw new ItemException("판매가 중지된 족보입니다.");
         }
 
+        if(item.getMember().equals(loginMember)){
+            throw new OrderException("내가 등록한 족보는 구매할 수 없습니다.");
+        }
+
         List<Cart> carts = loginMember.getCarts();
 
+        // TODO 장바구니 구매하지 않고 존재하면 이걸 그대로 결제
+        Cart orderCart = null;
+
         for (Cart cart : carts) {
-            if(cart.getItem().equals(item)){
-                throw new CartException("이미 장바구니에 존재하거나 구매한 족보입니다.");
+            if(cart.getItem().equals(item) && cart.getCartStatus().equals(CartStatus.ORDER)){
+                throw new CartException("이미 구매한 족보입니다.");
+            }
+            if(cart.getItem().equals(item) && cart.getCartStatus().equals(CartStatus.CART)){
+                orderCart = cart;
+                break;
             }
         }
 
-        Cart cart = Cart.createCart(loginMember, item);
+        if(orderCart == null){
+            orderCart = Cart.createCart(loginMember,item);
+        }
 
-        Order order = Order.createSingleOrder(loginMember, cart);
+        Order order = Order.createSingleOrder(loginMember, orderCart);
 
         Point point = Point.createPoint("족보 구매", -3, item, loginMember);
 
