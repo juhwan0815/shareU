@@ -1,5 +1,5 @@
 cloud:
   aws:
     credentials:
-      accessKey: AKIAVAXVF5PWY4BUNZWN
-      secretKey: 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
+      accessKey: IAM
+      secretKey: IAM
