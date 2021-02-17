@@ -21,7 +21,8 @@ public class ExceptionAdvice {
             CollegeException.class,
             LectureException.class,
             BadWordException.class,
-            ReportException.class
+            ReportException.class,
+            StoreException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){

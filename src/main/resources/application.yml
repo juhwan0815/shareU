@@ -34,6 +34,16 @@ spring:
   jwt:
     secret: inu-appcenter
 
+cloud:
+  aws:
+
+    s3:
+      bucket: shareu-file
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
 logging.level:
   org.hibernate.SQL: debug
 #  org.hibernate.type: trace

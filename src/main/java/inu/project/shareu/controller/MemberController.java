@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Api(tags = {"1.회원"})
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -111,8 +111,6 @@ public class MemberController {
 
         return ResponseEntity.ok().build();
     }
-
-    // TODO 차단 회원
 
     @ApiOperation(value = "회원 차단 해제",notes = "회원 차단 해제")
     @ApiImplicitParams({

@@ -1,9 +1,11 @@
 package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
+import inu.project.shareu.domain.Item;
 import inu.project.shareu.model.request.item.ItemSaveRequest;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
 import inu.project.shareu.service.ItemService;
+import inu.project.shareu.service.StoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -16,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Collection;
 
 @Api(tags = "2.족보")
@@ -38,7 +41,7 @@ public class ItemController {
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
         Long memberId = loginMember.getId();
 
-        itemService.saveItem(memberId,itemSaveRequest);
+        itemService.saveItem(memberId, itemSaveRequest);
 
         return ResponseEntity.ok().build();
     }

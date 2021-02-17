@@ -24,4 +24,16 @@ public class CartQueryRepository {
                         .and(cart.cartStatus.eq(CartStatus.ORDER)))
                 .fetch();
     }
+
+    public List<Cart> findCartByItemAndMemberId(Item item,Long memberId){
+        List<Cart> carts = queryFactory
+                .selectFrom(cart)
+                .where(cart.member.id.eq(memberId)
+                        .and(cart.item.eq(item)))
+                .fetch();
+        return carts;
+    }
+
+
+
 }

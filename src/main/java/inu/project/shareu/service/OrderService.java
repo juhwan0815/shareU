@@ -30,6 +30,7 @@ public class OrderService {
 
     @Transactional
     public void saveBulkOrder(Long memberId) {
+
         // TODO 수정예정
         Member loginMember = memberQueryRepository.findMemberWithCurrentCartsAndItemById(memberId);
         if(loginMember == null){
@@ -69,7 +70,6 @@ public class OrderService {
 
         List<Cart> carts = loginMember.getCarts();
 
-        // TODO 장바구니 구매하지 않고 존재하면 이걸 그대로 결제
         Cart orderCart = null;
 
         for (Cart cart : carts) {

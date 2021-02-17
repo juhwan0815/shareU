@@ -2,8 +2,10 @@ package inu.project.shareu.domain;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.io.File;
 
 @Entity
 @Getter
@@ -19,13 +21,26 @@ public class Store extends BaseEntity {
 
     private String fileStoreName;
 
-    private String fileSize;
+    private Long fileSize;
 
     private String fileContentType;
 
+    @Column(columnDefinition = "TEXT")
     private String resourcePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
+
+    public static Store creatStore(MultipartFile file, String storeName,
+                                   String resourcePath,Item item){
+        Store store = new Store();
+        store.fileOriginalName = file.getOriginalFilename();
+        store.fileStoreName = storeName;
+        store.fileContentType = file.getContentType();
+        store.fileSize = file.getSize();
+        store.resourcePath = resourcePath;
+        store.item = item;
+        return store;
+    }
 }

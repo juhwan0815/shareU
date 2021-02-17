@@ -20,8 +20,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
-
-
     @Override
     public void doFilter(ServletRequest request,
                          ServletResponse response,

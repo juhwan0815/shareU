@@ -9,6 +9,7 @@ import inu.project.shareu.model.request.item.ItemSaveRequest;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
 import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.CartQueryRepository;
+import inu.project.shareu.repository.query.ItemQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,11 @@ public class ItemService {
     private final MemberRepository memberRepository;
     private final PointRepository pointRepository;
     private final LectureRepository lectureRepository;
+    private final StoreService storeService;
     private final BadWordService badWordService;
     private final BadWordRepository badWordRepository;
     private final CartQueryRepository cartQueryRepository;
+    private final ItemQueryRepository itemQueryRepository;
 
     @Transactional
     public void saveItem(Long memberId, ItemSaveRequest itemSaveRequest) {
@@ -52,8 +55,10 @@ public class ItemService {
 
         Point point = Point.createPoint("족보 등록", 5, item, findMember);
 
-        itemRepository.save(item);
+        Item saveItem = itemRepository.save(item);
         pointRepository.save(point);
+
+        storeService.upload(itemSaveRequest.getFiles(),item);
     }
 
 
@@ -81,8 +86,7 @@ public class ItemService {
     @Transactional
     public void deleteItem(LoginMember loginMember, Long itemId) {
 
-        Item item = itemRepository.findWithMemberById(itemId)
-                .orElseThrow(() -> new ItemException("존재하지 않는 상품입니다."));
+        Item item = itemQueryRepository.findItemWithStoreAndMemberByItemId(itemId);
 
         List<GrantedAuthority> adminRole = loginMember.getAuthorities().stream()
                 .filter(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))
@@ -92,11 +96,14 @@ public class ItemService {
             if (!loginMember.getId().equals(item.getMember().getId())) {
                 throw new MemberException("상품의 판매자가 아닙니다.");
             }
+
             item.deleteItem();
+            item.getStoreList().forEach(store -> storeService.deleteStore(store));
 
         } else {
 
             int changePoint = item.deleteItemByAdmin();
+            item.getStoreList().forEach(store -> storeService.deleteStore(store));
 
             if(item.getMember().getCurrentPoint() > 0) {
                 Point point = Point.createPoint("족보 신고 처리로 인한 포인트 초기화", changePoint,

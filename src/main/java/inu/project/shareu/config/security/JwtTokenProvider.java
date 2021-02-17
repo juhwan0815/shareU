@@ -29,7 +29,7 @@ public class JwtTokenProvider {
     private Long tokenValidMilliSeconds = 1000L * 60 * 60 * 6; // 6시간 유효 TODO 시간 수정
 
     private final UserDetailsService userDetailsService;
-
+    
     @PostConstruct
     protected void init(){
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
