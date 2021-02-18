@@ -31,32 +31,25 @@ public class Order extends BaseEntity{
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<Cart> carts = new ArrayList<>();
 
-    // TODO 수정 예정
-    public Order(Member member,List<Cart> carts) {
-        this.member = member;
-        this.orderStatus = OrderStatus.ORDER;
-
-        for (Cart cart : carts) {
-            this.orderTotalPrice += cart.getOrderPrice();
-        }
-    }
-
-    public Order(Member member,Cart cart) {
-        this.member = member;
-        this.orderStatus = OrderStatus.ORDER;
-        this.orderTotalPrice = cart.getOrderPrice();
-    }
-
     public static Order createBulkOrder(Member member, List<Cart> carts){
-        Order order = new Order(member,carts);
-        for (Cart cart : carts) {
+        Order order = new Order();
+        order.member = member;
+        order.orderStatus = OrderStatus.ORDER;
+        order.orderTotalPrice = 0;
+
+        carts.forEach(cart -> {
+            order.orderTotalPrice += cart.getOrderPrice();
             cart.order(order);
-        }
+        });
+
         return order;
     }
 
     public static Order createSingleOrder(Member member, Cart cart){
-        Order order = new Order(member,cart);
+        Order order = new Order();
+        order.member = member;
+        order.orderStatus = OrderStatus.ORDER;
+        order.orderTotalPrice = cart.getOrderPrice();
         cart.order(order);
         return order;
     }

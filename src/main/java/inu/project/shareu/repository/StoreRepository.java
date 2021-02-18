@@ -16,4 +16,7 @@ public interface StoreRepository extends JpaRepository<Store,Long> {
     Optional<Store> findWithItemByFileStoreName(@Param("storeName") String storeName);
 
     List<Store> findByItem(Item item);
+
+    @Query("select s from Store s join fetch s.item where s.id =:storeId")
+    Optional<Store> findWithItemById(@Param("storeId") Long storeId);
 }

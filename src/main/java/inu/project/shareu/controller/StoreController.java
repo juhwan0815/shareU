@@ -1,6 +1,7 @@
 package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
+import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Store;
 import inu.project.shareu.service.StoreService;
 import io.swagger.annotations.Api;
@@ -32,7 +33,8 @@ public class StoreController {
     @ResponseBody
     public ResponseEntity removeStore(@PathVariable Long storeId){
 
-        storeService.deleteStore(storeId);
+        Member member = getLoginMember();
+        storeService.deleteStore(member,storeId);
 
         return ResponseEntity.ok().build();
     }
@@ -45,13 +47,19 @@ public class StoreController {
     @GetMapping("/store")
     public String getResourcePath(@RequestParam("storeName") String storeName){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        Member member = getLoginMember();
 
-        Store store = storeService.findStore(memberId, storeName);
+        Store store = storeService.findStore(member, storeName);
         return "redirect:"+store.getResourcePath();
     }
 
+    /**
+     * 현재 로그인한 사용자를 가져온다.
+     */
+    private Member getLoginMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        return loginMember.getMember();
+    }
 
 }

@@ -6,22 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member,Long> {
 
-    Optional<Member> findByStudentNumber(int studentNumber);
 
-    Optional<Member> findByName(String Name);
+    List<Member> findByStudentNumberOrName(int studentNumber,String name);
 
     @Query("select distinct m from Member m join fetch m.roles where m.id = :id")
     Optional<Member> findWithRoleById(@Param("id") Long id);
 
     @Query("select distinct m from Member m join fetch m.roles where m.studentNumber = :studentNumber")
     Optional<Member> findWithRoleByStudentNumber(@Param("studentNumber") int studentNumber);
-
-    @Query("select distinct m from Member m left join fetch m.carts where m.id = :memberId")
-    Optional<Member> findWithCartById(@Param("memberId") Long memberId);
-
 
 }

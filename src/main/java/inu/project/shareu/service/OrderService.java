@@ -5,10 +5,7 @@ import inu.project.shareu.advice.exception.ItemException;
 import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.advice.exception.OrderException;
 import inu.project.shareu.domain.*;
-import inu.project.shareu.repository.ItemRepository;
-import inu.project.shareu.repository.MemberRepository;
-import inu.project.shareu.repository.OrderRepository;
-import inu.project.shareu.repository.PointRepository;
+import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,51 +22,73 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
     private final OrderRepository orderRepository;
-    private final MemberQueryRepository memberQueryRepository;
     private final PointRepository pointRepository;
+    private final CartRepository cartRepository;
 
+    /**
+     * 장바구니 족보 모두 구매
+     * 1. 구매 전 장바구니를 모두 조회
+     * 2. 포인트 생성 리스트 생성 및 저장
+     * 3. 구매 생성 및 저장
+     * 4. 회원 저장 (merge)
+     */
     @Transactional
-    public void saveBulkOrder(Long memberId) {
+    public void saveBulkOrder(Member member) {
 
-        // TODO 수정예정
-        Member loginMember = memberQueryRepository.findMemberWithCurrentCartsAndItemById(memberId);
-        if(loginMember == null){
-            throw new CartException("현재 장바구니에 족보가 존재하지 않습니다.");
-        }
+        List<Cart> carts = cartRepository.findByMemberAndCartStatus(member, CartStatus.CART);
 
-        List<Cart> currentCarts = loginMember.getCarts();
-
-        List<Point> pointList = currentCarts.stream()
+        List<Point> pointList = carts.stream()
                 .map(cart -> Point.createPoint("족보 구매", -3,
-                        cart.getItem(), loginMember))
+                                                cart.getItem(), member))
                 .collect(Collectors.toList());
-
-
-        Order order = Order.createBulkOrder(loginMember, currentCarts);
-
         pointList.forEach(point -> pointRepository.save(point));
+
+        Order order = Order.createBulkOrder(member, carts);
         orderRepository.save(order);
+
+        memberRepository.save(member); // merge
     }
 
+    /**
+     * 족보 단건 구매
+     * 1. 족보 조회
+     * 2. 족보 판매 여부 확인
+     * 3. 현재 로그인 사용자가 족보 판매자인지 확인
+     * 4. 족보를 이미 구매 -> 오류 or 장바구니 -> 장바구니에 있는 것을 구매
+     * 5. 구매 생성 및 저장
+     * 6. 포인트 이력 생성 및 저장
+     * 7. 회원 저장 (merge)
+     */
     @Transactional
-    public void saveSingleOrder(Long memberId, Long itemId) {
-
-        Member loginMember = memberRepository.findWithCartById(memberId)
-                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
+    public void saveSingleOrder(Member member, Long itemId) {
 
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
 
-        if(!item.getItemstatus().equals(ItemStatus.SALE)){
-            throw new ItemException("판매가 중지된 족보입니다.");
-        }
+        validateItemStatus(item);
 
-        if(item.getMember().equals(loginMember)){
-            throw new OrderException("내가 등록한 족보는 구매할 수 없습니다.");
-        }
+        validateMemberRegisteredItem(member,item);
 
-        List<Cart> carts = loginMember.getCarts();
+        Cart orderCart = checkDuplicatedCartAndCreateCart(member, item);
 
+        Order order = Order.createSingleOrder(member, orderCart);
+        orderRepository.save(order);
+
+        Point point = Point.createPoint("족보 구매", -3, item, member);
+        pointRepository.save(point);
+
+        memberRepository.save(member); // merge
+    }
+
+    /**
+     * 족보를 이미 구매하였거나 장바구니에 담겨있는지 확인
+     * -> 장바구니에 담겨있으면 장바구니에 담겨있는 것을 가져온다.
+     * -> 구매한적이 없거나 장바구니에도 없으면 장바구니 생성
+     * @Return Cart
+     */
+    private Cart checkDuplicatedCartAndCreateCart(Member member, Item item) {
+
+        List<Cart> carts = cartRepository.findByMemberAndItem(member, item);
         Cart orderCart = null;
 
         for (Cart cart : carts) {
@@ -83,15 +102,28 @@ public class OrderService {
         }
 
         if(orderCart == null){
-            orderCart = Cart.createCart(loginMember,item);
+            orderCart = Cart.createCart(member, item);
         }
 
-        Order order = Order.createSingleOrder(loginMember, orderCart);
-
-        Point point = Point.createPoint("족보 구매", -3, item, loginMember);
-
-        pointRepository.save(point);
-        orderRepository.save(order);
+        return orderCart;
     }
 
+    /**
+     * 족보 판매 여부 확인
+     */
+    private void validateItemStatus(Item item) {
+        if(!item.getItemstatus().equals(ItemStatus.SALE)){
+            throw new ItemException("판매가 중지된 족보입니다.");
+        }
+    }
+
+    /**
+     * 족보의 판매자인지 확인
+     */
+    private void validateMemberRegisteredItem(Member member, Item item) {
+        // TODO 지연로딩 확인 필요
+        if(member.getId().equals(item.getMember().getId())){
+            throw new CartException("자신이 등록한 족보는 장바구니에 담을 수 없습니다.");
+        }
+    }
 }

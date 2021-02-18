@@ -1,6 +1,7 @@
 package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
+import inu.project.shareu.domain.Member;
 import inu.project.shareu.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -31,11 +32,9 @@ public class OrderController {
     @PostMapping("/orders")
     public ResponseEntity saveBulkOrder(){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        Member member = getLoginMember();
 
-        orderService.saveBulkOrder(memberId);
+        orderService.saveBulkOrder(member);
 
         return ResponseEntity.ok().build();
     }
@@ -48,12 +47,19 @@ public class OrderController {
     @PostMapping("/orders/items/{itemId}")
     public ResponseEntity saveSingleOrder(@PathVariable Long itemId){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        Member member = getLoginMember();
 
-        orderService.saveSingleOrder(memberId,itemId);
+        orderService.saveSingleOrder(member,itemId);
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 현재 로그인한 사용자를 가져온다.
+     */
+    private Member getLoginMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        return loginMember.getMember();
     }
 }

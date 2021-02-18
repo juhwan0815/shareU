@@ -5,7 +5,5 @@ import lombok.Data;
 @Data
 public class ReportReviewSaveRequest {
 
-    private Long reviewId;
-
     private String reportContents;
 }

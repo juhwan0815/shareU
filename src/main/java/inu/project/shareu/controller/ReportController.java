@@ -1,6 +1,7 @@
 package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
+import inu.project.shareu.domain.Member;
 import inu.project.shareu.model.request.report.ReportItemSaveRequest;
 import inu.project.shareu.model.request.report.ReportReviewSaveRequest;
 import inu.project.shareu.service.ReportService;
@@ -28,14 +29,13 @@ public class ReportController {
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header")
     })
-    @PostMapping("/reports/item")
-    public ResponseEntity saveReportItem(@ModelAttribute ReportItemSaveRequest reportItemSaveRequest){
+    @PostMapping("/reports/item/{itemId}")
+    public ResponseEntity saveReportItem(@PathVariable Long itemId,
+                                         @ModelAttribute ReportItemSaveRequest reportItemSaveRequest){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        Member member = getLoginMember();
 
-        reportService.saveReportItem(memberId,reportItemSaveRequest);
+        reportService.saveReportItem(member, itemId, reportItemSaveRequest);
 
         return ResponseEntity.ok().build();
     }
@@ -46,14 +46,13 @@ public class ReportController {
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header")
     })
-    @PostMapping("/reports/review")
-    public ResponseEntity saveReportReview(@ModelAttribute ReportReviewSaveRequest reportReviewSaveRequest){
+    @PostMapping("/reports/review/{reviewId}")
+    public ResponseEntity saveReportReview(@PathVariable Long reviewId,
+                                           @ModelAttribute ReportReviewSaveRequest reportReviewSaveRequest){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        Member member = getLoginMember();
 
-        reportService.saveReportReview(memberId,reportReviewSaveRequest);
+        reportService.saveReportReview(member,reviewId,reportReviewSaveRequest);
 
         return ResponseEntity.ok().build();
     }
@@ -70,5 +69,14 @@ public class ReportController {
         reportService.finishReport(reportId);
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 현재 로그인한 사용자를 가져온다.
+     */
+    private Member getLoginMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        return loginMember.getMember();
     }
 }

@@ -7,6 +7,7 @@ import inu.project.shareu.advice.exception.CartException;
 import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.domain.Cart;
 import inu.project.shareu.domain.Item;
+import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Store;
 import inu.project.shareu.repository.StoreRepository;
 import inu.project.shareu.repository.query.CartQueryRepository;
@@ -37,6 +38,15 @@ public class StoreService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    /**
+     * 족보의 파일 저장
+     * 1. MultiPartFile -> File로 변환
+     * 2. UUID를 이용하여 고유한 저장이름 생성
+     * 3. S3에 저장
+     * 4. 변환한 파일 삭제
+     * 5. S3의 파일 접근 경로를 얻어낸다.
+     * 6. 저장내역 생성 및 저장
+     */
     @Transactional
     public void saveFile(List<MultipartFile> files, Item item)  {
 
@@ -54,58 +64,54 @@ public class StoreService {
             String storeName = UUID.randomUUID().toString() + file.getOriginalFilename();
 
             amazonS3Client.putObject(new PutObjectRequest(bucket,storeName,uploadFile)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+                          .withCannedAcl(CannedAccessControlList.PublicRead));
 
             removeNewFile(uploadFile);
 
             String resourcePath = amazonS3Client.getUrl(bucket, storeName).toString();
 
             Store store = Store.creatStore(file, storeName, resourcePath,item);
-
             storeRepository.save(store);
         }
     }
 
+    /**
+     * 족보의 파일 삭제
+     * 1. 족보의 파일 조회
+     * 2. 파일 삭제
+     * 3. 파일 저장내역 모두 삭제
+     */
     @Transactional
     public void deleteStores(Item item){
 
         List<Store> stores = storeRepository.findByItem(item);
 
         stores.forEach(store -> {
-            if(amazonS3Client.doesObjectExist(bucket, store.getFileStoreName())){
-                amazonS3Client.deleteObject(bucket,store.getFileStoreName());
-            }
-
+            deleteS3Object(store);
             storeRepository.delete(store);
         });
     }
 
+    /**
+     * 파일 단건 삭제
+     * 1. 저장내역 조회
+     * 2. 로그인한 사용자가 파일의 주인 여부 확인
+     * 3. S3 파일 삭제
+     * 4. 저장 내역 삭제
+     */
     @Transactional
-    public void deleteStore(Long storeId){
+    public void deleteStore(Member member, Long storeId){
 
-        // TODO 족보와 작성자를 찾아서 비교
-
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findWithItemById(storeId)
                 .orElseThrow(() -> new StoreException("존재하지 않는 파일입니다."));
 
-         if(amazonS3Client.doesObjectExist(bucket, store.getFileStoreName())){
-             amazonS3Client.deleteObject(bucket,store.getFileStoreName());
-         }
+        validateStoreOwner(member, store);
 
-         storeRepository.delete(store);
-    }
-
-    @Transactional
-    public void deleteStore(Store store){
-
-        if(amazonS3Client.doesObjectExist(bucket,store.getFileStoreName())){
-            amazonS3Client.deleteObject(bucket,store.getFileStoreName());
-        }
+        deleteS3Object(store);
         storeRepository.delete(store);
     }
 
-
-    public Store findStore(Long memberId, String storeName){
+    public Store findStore(Member member, String storeName){
         // TODO 족보의 주인도 다운이 가능하게끔
 
         Store store = storeRepository.findWithItemByFileStoreName(storeName)
@@ -120,7 +126,27 @@ public class StoreService {
         return store;
     }
 
+    /**
+     * S3 에 파일이 존재하면 삭제
+     */
+    private void deleteS3Object(Store store) {
+        if (amazonS3Client.doesObjectExist(bucket, store.getFileStoreName())) {
+            amazonS3Client.deleteObject(bucket, store.getFileStoreName());
+        }
+    }
 
+    /**
+     * 로그인한 사용자가 파일의 주인 여부 확인
+     */
+    private void validateStoreOwner(Member member, Store store) {
+        if(member.getId().equals(store.getItem().getMember().getId())){
+            throw new StoreException("파일을 수정할 권한이 없습니다.");
+        }
+    }
+
+    /**
+     * 변환 파일 삭제
+     */
     private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
             log.info("파일이 삭제되었습니다.");
@@ -129,6 +155,9 @@ public class StoreService {
         }
     }
 
+    /**
+     * MultiPartFile -> File로 변환
+     */
     private Optional<File> convert(MultipartFile file) throws IOException {
 
         File convertFile = new File(file.getOriginalFilename());

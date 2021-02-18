@@ -5,8 +5,6 @@ import lombok.Data;
 @Data
 public class ReportItemSaveRequest {
 
-    private Long itemId;
-
     private String reportContents;
 
 }

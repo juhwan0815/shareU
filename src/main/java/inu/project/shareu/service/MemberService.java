@@ -22,7 +22,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MemberService {
 
-    private final MemberQueryRepository memberQueryRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -100,7 +99,7 @@ public class MemberService {
      * 이미 가입한 학번 or 별명 존재 여부 확인
      */
     private void validateDuplicateMember(int studentNumber,String name) {
-        List<Member> findMembers = memberQueryRepository.findMemberByStudentNumberOrName(studentNumber,name);
+        List<Member> findMembers = memberRepository.findByStudentNumberOrName(studentNumber,name);
 
         findMembers.forEach(member -> {
             if (studentNumber == member.getStudentNumber()) {
