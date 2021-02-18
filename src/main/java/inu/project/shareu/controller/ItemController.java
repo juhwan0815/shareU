@@ -2,8 +2,10 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Item;
+import inu.project.shareu.domain.Member;
 import inu.project.shareu.model.request.item.ItemSaveRequest;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
+import inu.project.shareu.service.BadWordService;
 import inu.project.shareu.service.ItemService;
 import inu.project.shareu.service.StoreService;
 import io.swagger.annotations.Api;
@@ -14,12 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.Collection;
 
 @Api(tags = "2.족보")
 @Slf4j
@@ -28,6 +26,8 @@ import java.util.Collection;
 public class ItemController {
 
     private final ItemService itemService;
+    private final StoreService storeService;
+    private final BadWordService badWordService;
 
     @ApiOperation(value = "족보 등록",notes = "족보 등록")
     @ApiImplicitParams({
@@ -37,14 +37,20 @@ public class ItemController {
     @PostMapping("/items")
     public ResponseEntity saveItem(@ModelAttribute ItemSaveRequest itemSaveRequest){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        // TODO 파일 타입 체크
 
-        itemService.saveItem(memberId, itemSaveRequest);
+        Member member = getLoginMember();
+
+        badWordService.validateItemForbiddenWord(itemSaveRequest.getTitle(),
+                                                 itemSaveRequest.getItemContents());
+
+        Item saveItem = itemService.saveItem(member, itemSaveRequest);
+
+        storeService.saveFile(itemSaveRequest.getFiles(),saveItem);
 
         return ResponseEntity.ok().build();
     }
+
 
     @ApiOperation(value = "족보 수정",notes = "족보 수정")
     @ApiImplicitParams({
@@ -55,11 +61,13 @@ public class ItemController {
     public ResponseEntity updateItem(@PathVariable Long itemId,
                                      @ModelAttribute ItemUpdateRequest itemUpdateRequest){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        // TODO 파일 수정은 어떻게?
+        Member member = getLoginMember();
 
-        itemService.updateItem(memberId,itemId,itemUpdateRequest);
+        badWordService.validateItemForbiddenWord(itemUpdateRequest.getTitle(),
+                                                 itemUpdateRequest.getItemContents());
+
+        itemService.updateItem(member,itemId,itemUpdateRequest);
 
         return ResponseEntity.ok().build();
     }
@@ -72,11 +80,20 @@ public class ItemController {
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity deleteItem(@PathVariable Long itemId){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-
-        itemService.deleteItem(loginMember,itemId);
+        Member member = getLoginMember();
+        // TODO 어드민 삭제 API만들기
+        Item item = itemService.deleteItem(member, itemId);
+        storeService.deleteStores(item);
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 현재 로그인한 사용자를 가져온다.
+     */
+    private Member getLoginMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
+        return loginMember.getMember();
     }
 }

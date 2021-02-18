@@ -26,7 +26,7 @@ public class MemberDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String memberPk) throws UsernameNotFoundException {
 
         Member findMember = memberRepository.findWithRoleById(Long.valueOf(memberPk))
-                .orElseThrow(() -> new MemberException("잘못된 로그인입니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
         if (findMember.getMemberStatus().equals(MemberStatus.BLOCK)){
             return null;
@@ -36,6 +36,6 @@ public class MemberDetailService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());
 
-        return new LoginMember(findMember.getId(), findMember.getName(), findMember.getPassword(), authorities);
+        return new LoginMember(findMember, findMember.getName(), findMember.getPassword(), authorities);
     }
 }

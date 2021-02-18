@@ -26,7 +26,7 @@ public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    private Long tokenValidMilliSeconds = 1000L * 60 * 60 * 6; // 6시간 유효 TODO 시간 수정
+    private Long tokenValidMilliSeconds = 1000L * 60 * 60; // 1시간 유효
 
     private final UserDetailsService userDetailsService;
     
@@ -35,9 +35,8 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String memberPk, List<String> roles){
+    public String createToken(String memberPk){
         Claims claims = Jwts.claims().setSubject(memberPk);
-        claims.put("roles",roles);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)

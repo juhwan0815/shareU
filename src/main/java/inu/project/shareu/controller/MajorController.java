@@ -41,6 +41,7 @@ public class MajorController {
     @PutMapping("/majors/{majorId}")
     public ResponseEntity updateMajor(@PathVariable Long majorId,
                                       @ModelAttribute MajorUpdateRequest majorUpdateRequest){
+
         majorService.updateMajor(majorId,majorUpdateRequest);
 
         return ResponseEntity.ok().build();

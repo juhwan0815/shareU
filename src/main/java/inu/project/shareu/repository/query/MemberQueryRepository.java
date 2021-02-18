@@ -22,6 +22,14 @@ public class MemberQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    public List<Member> findMemberByStudentNumberOrName(int studentNumber,String name){
+        return queryFactory
+                .selectFrom(member)
+                .where(member.studentNumber.eq(studentNumber)
+                        .or(member.name.eq(name)))
+                .fetch();
+    }
+
     public Member findMemberWithCurrentCartsAndItemById(Long memberId) {
         // TODO 쿼리 수정 예정
         Member loginMember = queryFactory

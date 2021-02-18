@@ -4,13 +4,10 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import inu.project.shareu.advice.exception.CartException;
-import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.domain.Cart;
 import inu.project.shareu.domain.Item;
-import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Store;
-import inu.project.shareu.repository.MemberRepository;
 import inu.project.shareu.repository.StoreRepository;
 import inu.project.shareu.repository.query.CartQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,11 +38,9 @@ public class StoreService {
     private String bucket;
 
     @Transactional
-    public void upload(List<MultipartFile> files, Item item)  {
+    public void saveFile(List<MultipartFile> files, Item item)  {
 
         for (MultipartFile file : files) {
-
-            // TODO 파일 타입 체크
 
             File uploadFile = null;
 
@@ -73,8 +67,24 @@ public class StoreService {
     }
 
     @Transactional
+    public void deleteStores(Item item){
+
+        List<Store> stores = storeRepository.findByItem(item);
+
+        stores.forEach(store -> {
+            if(amazonS3Client.doesObjectExist(bucket, store.getFileStoreName())){
+                amazonS3Client.deleteObject(bucket,store.getFileStoreName());
+            }
+
+            storeRepository.delete(store);
+        });
+    }
+
+    @Transactional
     public void deleteStore(Long storeId){
+
         // TODO 족보와 작성자를 찾아서 비교
+
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException("존재하지 않는 파일입니다."));
 
@@ -87,6 +97,7 @@ public class StoreService {
 
     @Transactional
     public void deleteStore(Store store){
+
         if(amazonS3Client.doesObjectExist(bucket,store.getFileStoreName())){
             amazonS3Client.deleteObject(bucket,store.getFileStoreName());
         }
@@ -119,6 +130,7 @@ public class StoreService {
     }
 
     private Optional<File> convert(MultipartFile file) throws IOException {
+
         File convertFile = new File(file.getOriginalFilename());
         if (convertFile.createNewFile()) {
             try (FileOutputStream fos = new FileOutputStream(convertFile)) {

@@ -35,7 +35,7 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @ApiOperation(value = "회원가입",notes = "회원 가입")
-    @PostMapping("/members/signup")
+    @PostMapping("/members")
     public ResponseEntity saveMember(@ModelAttribute MemberSaveRequest memberSaveRequest) {
 
         memberService.saveMember(memberSaveRequest);
@@ -44,54 +44,18 @@ public class MemberController {
     }
 
     @ApiOperation(value = "회원 로그인",notes = "회원 로그인")
-    @PostMapping("/members/signin")
+    @PostMapping("/members/login")
     public ResponseEntity<MemberLoginResponse> loginMember(@ModelAttribute MemberLoginRequest memberLoginRequest) {
 
         Member loginMember = memberService.loginMember(memberLoginRequest);
 
-        List<String> roles = new ArrayList<>();
-        loginMember.getRoles().forEach(role -> roles.add(role.getRoleName()));
-
-        String token = "Bearer "+jwtTokenProvider.createToken(String.valueOf(loginMember.getId()), roles);
-
+        String token = "Bearer "+ jwtTokenProvider.createToken(String.valueOf(loginMember.getId()));
         MemberLoginResponse memberLoginResponse = new MemberLoginResponse(token);
 
         return ResponseEntity.ok(memberLoginResponse);
     }
 
-    @ApiOperation(value = "비밀번호 변경",notes = "회원 비밀번호 변경")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
-    })
-    @PatchMapping("/members/change-password")
-    public ResponseEntity changePassword(@ModelAttribute MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
-
-        // TODO 통합
-        memberService.changePassword(memberId,memberUpdatePasswordRequest);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @ApiOperation(value = "닉네임 변경",notes = "회원 닉네임 변경")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
-    })
-    @PatchMapping("/members/change-name")
-    public ResponseEntity changeName(@ModelAttribute MemberUpdateNameRequest memberUpdateNameRequest){
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
-
-        memberService.changeName(memberId,memberUpdateNameRequest);
-        return ResponseEntity.ok().build();
-    }
+    // TODO 회원 수정
 
     @ApiOperation(value = "회원 탈퇴",notes = "회원 탈퇴")
     @ApiImplicitParams({
@@ -103,9 +67,9 @@ public class MemberController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        Long memberId = loginMember.getId();
+        Member member = loginMember.getMember();
 
-        memberService.removeMember(memberId);
+        memberService.removeMember(member);
 
         // TODO 회원 탈퇴시 족보, 구매, 장바구니 등등 모든 엔티티 삭제?
 

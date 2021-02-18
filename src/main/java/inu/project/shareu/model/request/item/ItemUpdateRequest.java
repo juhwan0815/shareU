@@ -9,7 +9,4 @@ public class ItemUpdateRequest {
 
     private String itemContents;
 
-    private String className;
-
-    private String professor;
 }

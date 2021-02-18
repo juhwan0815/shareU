@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // TODO 자원 보안 최종 확인하기
         http
                 .httpBasic().disable()
                 .cors().configurationSource(corsConfigurationSource())
