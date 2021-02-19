@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +27,18 @@ public class ItemService {
 
     /**
      * 족보 저장
-     * 1. 강의 조회
-     * 2. 족보 생성 및 저장
-     * 3. 포인트 이력 생성 및 저장
-     * 4. 회원 저장 ( merge ) why? 준영속 상태이기 때문
+     * 1. 회원 조회
+     * 2. 강의 조회
+     * 3. 족보 생성 및 저장
+     * 4. 포인트 이력 생성 및 저장
+     *
      * @Return Item
      */
     @Transactional
     public Item saveItem(Member loginMember, ItemSaveRequest itemSaveRequest) {
+
+        Member findMember = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Lecture findLecture = lectureRepository.findWithMajorById(itemSaveRequest.getLectureId())
                 .orElseThrow(() -> new LectureException("존재하지 않는 강의입니다."));
@@ -43,15 +46,13 @@ public class ItemService {
         Item item = Item.createItem(itemSaveRequest.getTitle(),
                                     itemSaveRequest.getItemContents(),
                                     findLecture,
-                                    loginMember,
+                                    findMember,
                                     findLecture.getMajor());
 
         Item saveItem = itemRepository.save(item);
 
-        Point point = Point.createPoint("족보 등록", 5, item, loginMember);
+        Point point = Point.createPoint("족보 등록", 5, item, findMember);
         pointRepository.save(point);
-
-        memberRepository.save(loginMember); // merge
 
         return saveItem;
     }
@@ -74,6 +75,31 @@ public class ItemService {
                         itemUpdateRequest.getItemContents());
     }
 
+    /**
+     * 관리자에 의한 족보 삭제
+     * 1. 족보 조회
+     * 2. 족보를 구매한 사람들에게 포인트 환불 처리
+     * 3. 족보 상태 변경
+     * 4. 족보 작성자의 포인트 초기화 및 포인트 이력 생성 및 저장
+     * @Return Item
+     */
+    @Transactional
+    public Item deleteItemByAdmin(Long itemId){
+
+        Item item = itemRepository.findWithMemberById(itemId)
+                .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
+
+        refundPointToOrderMember(item);
+
+        int changePoint = item.deleteItemByAdmin();
+
+        Point point = Point.createPoint("족보 신고 처리로 인한 포인트 초기화",
+                                        changePoint, item, item.getMember());
+        pointRepository.save(point);
+
+        return item;
+    }
+
 
     /**
      * 족보 삭제
@@ -93,41 +119,23 @@ public class ItemService {
         item.deleteItem();
 
         return item;
+    }
 
-        // TODO 아래 코드 지우기
-//        if (adminRole.isEmpty()) {
-//
-//            if (!member.getId().equals(item.getMember().getId())) {
-//                throw new MemberException("상품의 판매자가 아닙니다.");
-//            }
-//
-//            item.deleteItem();
-//            item.getStoreList().forEach(store -> storeService.deleteStore(store));
-//
-//        } else {
-//
-//            int changePoint = item.deleteItemByAdmin();
-//            item.getStoreList().forEach(store -> storeService.deleteStore(store));
-//
-//            if(item.getMember().getCurrentPoint() > 0) {
-//                Point point = Point.createPoint("족보 신고 처리로 인한 포인트 초기화", changePoint,
-//                        item, item.getMember());
-//                pointRepository.save(point);
-//            }
-//
-//            List<Cart> carts = cartQueryRepository.findCartWithMemberByItemAndCartStatus(item);
-//
-//            if(!carts.isEmpty()){
-//                carts.forEach(cart -> {
-//                    int orderPrice = cart.cancel();
-//                    Point refundPoint = Point.createPoint("족보 신고 처리로 인한 환불", orderPrice,
-//                            item, cart.getMember());
-//                    pointRepository.save(refundPoint);
-//                });
-//            }
-//        }
+    /**
+     * 족보를 구매한 사람들 모두 환불 처리
+     */
+    private void refundPointToOrderMember(Item item) {
+        List<Cart> carts = cartQueryRepository.findWithMemberByItemAndCartStatus(item,CartStatus.ORDER);
 
-
+        if(!carts.isEmpty()){
+            carts.forEach(cart -> {
+                cart.cancel();
+                Point refundPoint = Point.createPoint("족보 신고 처리로 인한 환불",
+                        cart.getOrderPrice(),
+                        item, cart.getMember());
+                pointRepository.save(refundPoint);
+            });
+        }
     }
 
     /**

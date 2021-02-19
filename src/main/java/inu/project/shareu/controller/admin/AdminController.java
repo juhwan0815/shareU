@@ -1,11 +1,12 @@
-package inu.project.shareu.controller;
+package inu.project.shareu.controller.admin;
 
 import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.config.security.LoginMember;
+import inu.project.shareu.domain.Item;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Store;
 import inu.project.shareu.model.common.store.StoreDto;
-import inu.project.shareu.service.StoreService;
+import inu.project.shareu.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -16,31 +17,73 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-@Api(tags = "7 .파일")
+@Api(tags = "관리자")
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
-public class StoreController {
+@RequestMapping("/admin")
+public class AdminController {
 
+    private final ItemService itemService;
+    private final ReviewService reviewService;
+    private final MemberService memberService;
     private final StoreService storeService;
+    private final ReportService reportService;
 
-    @ApiOperation(value = "파일 삭제",notes = "파일 삭제")
+    @ApiOperation(value = "관리자 족보 삭제",notes = "관리자 족보 삭제")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header")
     })
-    @DeleteMapping("/store/{storeId}")
-    @ResponseBody
-    public ResponseEntity removeStore(@PathVariable Long storeId){
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity deleteItemByAdmin(@PathVariable Long itemId){
 
-        Member member = getLoginMember();
-        storeService.deleteStore(member,storeId);
+        Item item = itemService.deleteItemByAdmin(itemId);
+        storeService.deleteStores(item);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation(value = "관리자 리뷰 삭제",notes = "관리자 리뷰 삭제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity deleteReviewByAdmin(@PathVariable Long reviewId){
+
+        reviewService.deleteReviewByAdmin(reviewId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation(value = "관리자 회원 차단 해제",notes = "관리자 회원 차단 해제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @PatchMapping("/members/{memberId}")
+    public ResponseEntity changeMemberStatus(@PathVariable Long memberId){
+
+        memberService.changeMemberStatus(memberId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation(value = "신고 처리 완료",notes = "신고 처리 완료")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @DeleteMapping("/reports/{reportId}")
+    public ResponseEntity finishReport(@PathVariable Long reportId){
+
+        reportService.finishReport(reportId);
 
         return ResponseEntity.ok().build();
     }
@@ -51,11 +94,10 @@ public class StoreController {
                     ,dataType = "String", paramType = "header")
     })
     @GetMapping("/store")
-    public ResponseEntity<ByteArrayResource> getResourcePath(@RequestParam("storeName") String storeName){
+    public ResponseEntity<ByteArrayResource> getResourcePathByAdmin(@RequestParam("storeName") String storeName){
 
-        Member member = getLoginMember();
 
-        StoreDto storeDto = storeService.downloadFile(member,storeName);
+        StoreDto storeDto = storeService.downloadFileByAdmin(storeName);
         Store store = storeDto.getStore();
         byte[] data = storeDto.getData();
 
@@ -84,6 +126,7 @@ public class StoreController {
         }
         return encordedFilename;
     }
+
 
     /**
      * 현재 로그인한 사용자를 가져온다.

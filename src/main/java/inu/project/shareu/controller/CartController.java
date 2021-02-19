@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-@Api(tags = "5.장바구니")
+@Api(tags = "4. 장바구니")
 @Slf4j
 @Controller
 @RequiredArgsConstructor

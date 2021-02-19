@@ -19,6 +19,9 @@ public class Review extends BaseEntity {
     private String reviewContents;
 
     @Enumerated(EnumType.STRING)
+    private RecommendStatus recommendStatus;
+
+    @Enumerated(EnumType.STRING)
     private ReviewStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,11 +38,13 @@ public class Review extends BaseEntity {
         review.reviewContents =reviewContents;
         review.item = item;
         review.member = member;
+        review.status = ReviewStatus.LIVE;
+
 
         if(recommend){
-            review.status = ReviewStatus.GOOD;
+            review.recommendStatus = RecommendStatus.GOOD;
         }else {
-            review.status = ReviewStatus.BAD;
+            review.recommendStatus = RecommendStatus.BAD;
         }
 
         return review;
@@ -49,11 +54,15 @@ public class Review extends BaseEntity {
     public void updateReview(String reviewContents, Boolean recommend) {
 
         if(recommend){
-            this.status = ReviewStatus.GOOD;
+            this.recommendStatus = RecommendStatus.GOOD;
         }else{
-            this.status = ReviewStatus.BAD;
+            this.recommendStatus = RecommendStatus.BAD;
         }
 
         this.reviewContents = reviewContents;
+    }
+
+    public void changeStatus() {
+        this.status = ReviewStatus.DELETE;
     }
 }

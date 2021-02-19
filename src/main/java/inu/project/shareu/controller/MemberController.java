@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(tags = {"1.회원"})
+@Api(tags = {"1. 회원"})
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -76,17 +76,5 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @ApiOperation(value = "회원 차단 해제",notes = "회원 차단 해제")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
-    })
-    @PatchMapping("/members/{memberId}")
-    public ResponseEntity changeMemberStatus(@PathVariable Long memberId){
-
-       memberService.changeMemberStatus(memberId);
-
-        return ResponseEntity.ok().build();
-    }
 }
 

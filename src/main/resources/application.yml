@@ -1,19 +1,9 @@
 spring:
-  mail:
-    host: smtp.gmail.com # smtp Gmail 설정
-    port: 587  # smtp 포트 설정
-    username: juwom0831@gmail.com # 구글 아이디
-    password: rjatjd0815* # 비밀번호
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-
   servlet:
     multipart:
       enabled: true
       max-file-size: 100MB # 파일 최대 크기 100 MB
       max-request-size: 100MB # 파일 최대 요청 크기 100 MB
-      location: /Users/juhwan/temp/ # 파일 저장 위치 MAC 기준
 
   datasource:
     url: jdbc:mysql://localhost:3306/shareu?useSSL=false&useUnicode=true&autoReconnect=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=Asia/Seoul
@@ -36,7 +26,6 @@ spring:
 
 cloud:
   aws:
-
     s3:
       bucket: shareu-file
     region:

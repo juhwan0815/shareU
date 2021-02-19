@@ -1,4 +1,4 @@
-package inu.project.shareu.controller;
+package inu.project.shareu.controller.admin;
 
 import inu.project.shareu.model.request.lecture.LectureSaveRequest;
 import inu.project.shareu.model.request.lecture.LectureUpdateRequest;
@@ -12,10 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "7.강의")
+@Api(tags = "강의")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/admin")
 public class LectureController {
 
     private final LectureService lectureService;

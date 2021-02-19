@@ -56,7 +56,7 @@ public class CartService {
     @Transactional
     public void deleteCart(Member member, Long cartId) {
 
-        Cart cart = cartRepository.findWithMemberById(cartId)
+        Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartException("존재하지 않는 장바구니입니다."));
 
         validateCartOwner(member, cart);
@@ -68,7 +68,6 @@ public class CartService {
      * 장바구니의 주인인지 확인
      */
     private void validateCartOwner(Member member, Cart cart) {
-        // TODO 지연로딩 쿼리 확인
         if(!cart.getMember().getId().equals(member.getId())){
             throw new MemberException("다른 회원의 장바구니를 삭제할 수 없습니다.");
         }
@@ -89,7 +88,6 @@ public class CartService {
      * 족보의 판매자인지 확인
      */
     private void validateMemberRegisteredItem(Member member, Item item) {
-        // TODO 지연로딩 확인 필요
         if(member.getId().equals(item.getMember().getId())){
             throw new CartException("자신이 등록한 족보는 장바구니에 담을 수 없습니다.");
         }

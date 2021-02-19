@@ -16,7 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "9.신고")
+@Api(tags = "6. 신고")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -53,20 +53,6 @@ public class ReportController {
         Member member = getLoginMember();
 
         reportService.saveReportReview(member,reviewId,reportReviewSaveRequest);
-
-        return ResponseEntity.ok().build();
-    }
-
-
-    @ApiOperation(value = "신고 처리 완료",notes = "신고 처리 완료")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
-    })
-    @DeleteMapping("/reports/{reportId}")
-    public ResponseEntity finishReport(@PathVariable Long reportId){
-
-        reportService.finishReport(reportId);
 
         return ResponseEntity.ok().build();
     }

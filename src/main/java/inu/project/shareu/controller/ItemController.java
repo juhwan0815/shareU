@@ -19,7 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "2.족보")
+@Api(tags = "2. 족보")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -81,7 +81,7 @@ public class ItemController {
     public ResponseEntity deleteItem(@PathVariable Long itemId){
 
         Member member = getLoginMember();
-        // TODO 어드민 삭제 API만들기
+
         Item item = itemService.deleteItem(member, itemId);
         storeService.deleteStores(item);
 

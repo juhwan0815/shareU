@@ -27,15 +27,21 @@ public class OrderService {
 
     /**
      * 장바구니 족보 모두 구매
-     * 1. 구매 전 장바구니를 모두 조회
-     * 2. 포인트 생성 리스트 생성 및 저장
-     * 3. 구매 생성 및 저장
-     * 4. 회원 저장 (merge)
+     * 1. 회원 조회
+     * 2. 구매 전 장바구니를 모두 조회
+     * 3. 장바구니에 족보가 존재하는지 여부 확인
+     * 4. 포인트 생성 리스트 생성 및 저장
+     * 5. 구매 생성 및 저장
      */
     @Transactional
-    public void saveBulkOrder(Member member) {
+    public void saveBulkOrder(Member loginMember) {
+
+        Member member= memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         List<Cart> carts = cartRepository.findByMemberAndCartStatus(member, CartStatus.CART);
+
+        validateCartsExist(carts);
 
         List<Point> pointList = carts.stream()
                 .map(cart -> Point.createPoint("족보 구매", -3,
@@ -45,22 +51,25 @@ public class OrderService {
 
         Order order = Order.createBulkOrder(member, carts);
         orderRepository.save(order);
-
-        memberRepository.save(member); // merge
     }
+
+
 
     /**
      * 족보 단건 구매
-     * 1. 족보 조회
-     * 2. 족보 판매 여부 확인
-     * 3. 현재 로그인 사용자가 족보 판매자인지 확인
-     * 4. 족보를 이미 구매 -> 오류 or 장바구니 -> 장바구니에 있는 것을 구매
-     * 5. 구매 생성 및 저장
-     * 6. 포인트 이력 생성 및 저장
-     * 7. 회원 저장 (merge)
+     * 1. 회원 조회
+     * 2. 족보 조회
+     * 3. 족보 판매 여부 확인
+     * 4. 현재 로그인 사용자가 족보 판매자인지 확인
+     * 5. 족보를 이미 구매 -> 오류 or 장바구니 -> 장바구니에 있는 것을 구매
+     * 6. 구매 생성 및 저장
+     * 7. 포인트 이력 생성 및 저장
      */
     @Transactional
-    public void saveSingleOrder(Member member, Long itemId) {
+    public void saveSingleOrder(Member loginMember, Long itemId) {
+
+        Member member = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
@@ -76,8 +85,6 @@ public class OrderService {
 
         Point point = Point.createPoint("족보 구매", -3, item, member);
         pointRepository.save(point);
-
-        memberRepository.save(member); // merge
     }
 
     /**
@@ -121,9 +128,17 @@ public class OrderService {
      * 족보의 판매자인지 확인
      */
     private void validateMemberRegisteredItem(Member member, Item item) {
-        // TODO 지연로딩 확인 필요
         if(member.getId().equals(item.getMember().getId())){
             throw new CartException("자신이 등록한 족보는 장바구니에 담을 수 없습니다.");
+        }
+    }
+
+    /**
+     * 장바구니에 족보가 존재하는지 여부 확인
+     */
+    private void validateCartsExist(List<Cart> carts) {
+        if(carts.isEmpty()){
+            throw new CartException("장바구니에 담긴 족보가 존재하지 않습니다.");
         }
     }
 }

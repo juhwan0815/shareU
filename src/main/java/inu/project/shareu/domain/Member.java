@@ -1,5 +1,6 @@
 package inu.project.shareu.domain;
 
+import inu.project.shareu.advice.exception.MemberException;
 import lombok.*;
 
 import javax.persistence.*;
@@ -60,7 +61,12 @@ public class Member extends BaseEntity {
     }
 
     public void changePoint(int changePoint) {
+
         this.currentPoint += changePoint;
+
+        if(currentPoint < 0){
+            throw new MemberException("포인트가 부족합니다.");
+        }
     }
 
     public int getChangePoint() {

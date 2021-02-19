@@ -1,6 +1,5 @@
 package inu.project.shareu.repository;
 
-import inu.project.shareu.controller.LectureController;
 import inu.project.shareu.domain.Lecture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

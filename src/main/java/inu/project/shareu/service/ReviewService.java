@@ -27,15 +27,18 @@ public class ReviewService {
 
     /**
      * 리뷰 등록
-     * 1. 족보 조회
-     * 2. 이미 족보에 대해 회원이 리뷰를 작성한 적이 있는지 확인
-     * 3. 회원이 족보를 구매했는지 확인
-     * 4. 리뷰 생성 및 저장
-     * 5. 포인트 이력 생성 및 저장
-     * 6. 회원 저장 (merge)
+     * 1. 회원 조회
+     * 2. 족보 조회
+     * 3. 이미 족보에 대해 회원이 리뷰를 작성한 적이 있는지 확인
+     * 4. 회원이 족보를 구매했는지 확인
+     * 5. 리뷰 생성 및 저장
+     * 6. 포인트 이력 생성 및 저장
      */
     @Transactional
-    public void saveReview(Member member, ReviewSaveRequest reviewSaveRequest) {
+    public void saveReview(Member loginMember, ReviewSaveRequest reviewSaveRequest) {
+
+        Member member = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
         Item item = itemRepository.findById(reviewSaveRequest.getItemId())
                 .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
@@ -51,8 +54,6 @@ public class ReviewService {
 
         Point point = Point.createPoint("리뷰 등록", 3, item, member);
         pointRepository.save(point);
-
-        memberRepository.save(member); // merge
     }
 
     /**
@@ -65,7 +66,7 @@ public class ReviewService {
     public void updateReview(Long reviewId, Member member,
                              ReviewUpdateRequest reviewUpdateRequest) {
 
-        Review findReview = reviewRepository.findWithMemberById(reviewId)
+        Review findReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
         validateReviewOwner(member, findReview);
@@ -77,39 +78,41 @@ public class ReviewService {
     /**
      * 리뷰 삭제
      * 1. 리뷰 조회
+     * 2. 리뷰 작성자 포인트 초기화
+     * 3. 포인트 초기화 이력 생성 및 저장
+     * 4. 리뷰 삭제
+     */
+    @Transactional
+    public void deleteReviewByAdmin(Long reviewId){
+
+        Review findReview = reviewRepository.findWithMemberById(reviewId)
+                .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
+
+        int changePoint = findReview.getMember().getChangePoint();
+
+        Point point = Point.createPoint("리뷰 신고로 인한 포인트 초기화 처리", changePoint,
+                findReview.getItem(), findReview.getMember());
+        pointRepository.save(point);
+
+        findReview.changeStatus();
+    }
+
+
+    /**
+     * 리뷰 삭제
+     * 1. 리뷰 조회
      * 2. 현재 로그인한 사용자가 리뷰의 작성자인지 확인
      * 3. 리뷰 삭제
      */
     @Transactional
     public void deleteReview(Long reviewId, Member member) {
 
-        Review findReview = reviewRepository.findWithMemberAndItemById(reviewId)
+        Review findReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
         validateReviewOwner(member,findReview);
 
-        reviewRepository.delete(findReview);
-
-        // TODO 리뷰 어드민 api
-//        if (adminRole.isEmpty()) {
-//
-//            if (!findReview.getMember().getId().equals(loginMember.getId())) {
-//                throw new MemberException("리뷰의 작성자가 아닙니다.");
-//            }
-//            reviewRepository.delete(findReview);
-//
-//        } else {
-//
-//            int changePoint = findReview.getMember().getChangePoint();
-//
-//            if (findReview.getMember().getCurrentPoint() > 0) {
-//                Point point = Point.createPoint("리뷰 신고로 인한 포인트 초기화 처리", changePoint,
-//                        findReview.getItem(), findReview.getMember());
-//                pointRepository.save(point);
-//            }
-//
-//            reviewRepository.delete(findReview);
-//        }
+        findReview.changeStatus();
     }
 
     /**

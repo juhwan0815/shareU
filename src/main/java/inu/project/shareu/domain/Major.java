@@ -17,7 +17,7 @@ public class Major{
     @Column(nullable = false,unique = true)
     private String majorName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")
     private College college;
 

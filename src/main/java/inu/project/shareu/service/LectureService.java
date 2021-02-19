@@ -38,7 +38,6 @@ public class LectureService {
         Lecture lecture = Lecture.createLecture(lectureSaveRequest.getLectureName(),
                                                 lectureSaveRequest.getProfessor(),
                                                 major);
-
         lectureRepository.save(lecture);
     }
 

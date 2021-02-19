@@ -1,4 +1,4 @@
-package inu.project.shareu.controller;
+package inu.project.shareu.controller.admin;
 
 import inu.project.shareu.model.request.major.MajorSaveRequest;
 import inu.project.shareu.model.request.major.MajorUpdateRequest;
@@ -12,10 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "3.전공,교양")
+@Api(tags = "전공,교양")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/admin")
 public class MajorController {
 
     private final MajorService majorService;

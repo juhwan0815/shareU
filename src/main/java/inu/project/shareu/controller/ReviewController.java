@@ -17,7 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "4.리뷰")
+@Api(tags = "3. 리뷰")
 @Slf4j
 @RestController
 @RequiredArgsConstructor

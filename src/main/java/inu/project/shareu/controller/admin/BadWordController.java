@@ -1,4 +1,4 @@
-package inu.project.shareu.controller;
+package inu.project.shareu.controller.admin;
 
 import inu.project.shareu.model.request.badword.BadWordSaveRequest;
 import inu.project.shareu.service.BadWordService;
@@ -11,10 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "8.금칙어")
+@Api(tags = "금칙어")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/admin")
 public class BadWordController {
 
     private final BadWordService badWordService;

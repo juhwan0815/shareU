@@ -34,7 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // TODO 자원 보안 최종 확인하기
         http
                 .httpBasic().disable()
                 .cors().configurationSource(corsConfigurationSource())
@@ -44,10 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/exception/**").permitAll()
-                .antMatchers("/members/signin","/members/signup").permitAll()
-                .antMatchers("/badwords/**","/lectures/**","/majors/**").hasRole("ADMIN")
-                .antMatchers("/members/{memberId}").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE,"/reports/{reportId}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/members/login","/members").permitAll()
+                .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().hasAnyRole("MEMBER","ADMIN")
                 .and()
                 .exceptionHandling()

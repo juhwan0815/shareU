@@ -16,13 +16,12 @@ public class CartQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Cart> findCartByItemAndMemberId(Item item,Long memberId){
-        List<Cart> carts = queryFactory
+    public List<Cart> findWithMemberByItemAndCartStatus(Item item, CartStatus cartStatus) {
+        return queryFactory
                 .selectFrom(cart)
-                .where(cart.member.id.eq(memberId)
-                        .and(cart.item.eq(item)))
+                .join(cart.member, member).fetchJoin()
+                .where(cart.item.eq(item)
+                        .and(cart.cartStatus.eq(cartStatus)))
                 .fetch();
-        return carts;
     }
-
 }
