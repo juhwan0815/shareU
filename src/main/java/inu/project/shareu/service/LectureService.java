@@ -6,11 +6,19 @@ import inu.project.shareu.domain.Lecture;
 import inu.project.shareu.domain.Major;
 import inu.project.shareu.model.request.lecture.LectureSaveRequest;
 import inu.project.shareu.model.request.lecture.LectureUpdateRequest;
+import inu.project.shareu.model.response.lecture.LectureNameResponse;
+import inu.project.shareu.model.response.lecture.LectureProfessorResponse;
+import inu.project.shareu.model.response.lecture.LectureResponse;
 import inu.project.shareu.repository.LectureRepository;
 import inu.project.shareu.repository.MajorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +83,50 @@ public class LectureService {
     }
 
     /**
+     * 전공으로 강의명 조회
+     * 1. 전공 조회
+     * 2. 강의 조회
+     * 3. DTO로 변환
+     * @Return List<LectureNameResponse>
+     */
+    public List<LectureNameResponse> findLectureNameByMajorId(Long majorId) {
+
+        Major findMajor = majorRepository.findById(majorId)
+                .orElseThrow(() -> new MajorException("존재하지 않는 전공입니다."));
+
+        List<Lecture> findLectures = lectureRepository.findByMajor(findMajor);
+        return findLectures.stream()
+                .map(lecture -> new LectureNameResponse(lecture))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 강의명으로 교수 조회
+     * 1. 강의조회
+     * 2. DTO로 변환
+     * @return List<LectureProfessorResponse>
+     */
+    public List<LectureProfessorResponse> findLectureProfessorByLectureName(String lectureName) {
+
+        List<Lecture> findLectures = lectureRepository.findByLectureName(lectureName);
+
+        return findLectures.stream()
+                .map(lecture -> new LectureProfessorResponse(lecture))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 강의 페이징 조회
+     * 1. 강의 조회
+     * 2. DTO로 변환
+     * @Return Page<LectureResponse>
+     */
+    public Page<LectureResponse> findPage(Pageable pageable) {
+        Page<Lecture> lectures = lectureRepository.findAll(pageable);
+        return lectures.map(lecture -> new LectureResponse(lecture));
+    }
+
+    /**
      * 동일 강의 존재 여부 확인
      */
     private void validateSameLecture(String lectureName,String professor) {
@@ -82,5 +134,6 @@ public class LectureService {
             throw new LectureException("이미 존재하는 강의입니다.");
         }
     }
+
 
 }

@@ -2,66 +2,33 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.service.OrderService;
-import inu.project.shareu.service.query.CartQueryService;
+import inu.project.shareu.service.PointService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "5. 구매")
+@Api(tags = "포인트")
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
-public class OrderController {
+public class PointController {
 
-    private final OrderService orderService;
-    private final CartQueryService cartQueryService;
+    private final PointService pointService;
 
-    @ApiOperation(value = "장바구니 일괄 구매",notes = "장바구니 일괄 구매")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
-    })
-    @PostMapping("/orders")
-    public ResponseEntity saveBulkOrder(){
-
-        Member member = getLoginMember();
-
-        orderService.saveBulkOrder(member);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @ApiOperation(value = "족보 단품 구매",notes = "족보 단품 구매")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
-    })
-    @PostMapping("/orders/items/{itemId}")
-    public ResponseEntity saveSingleOrder(@PathVariable Long itemId){
-
-        Member member = getLoginMember();
-
-        orderService.saveSingleOrder(member,itemId);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @ApiOperation(value = "구매한 족보 조회",notes = "구매한 족보 조회")
+    @ApiOperation(value = "포인트 이력 조회",notes = "포인트 이력 조회")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header"),
@@ -70,15 +37,28 @@ public class OrderController {
             @ApiImplicitParam(name = "size",value = "페이징 사이즈",required = true
                     ,dataType = "int", paramType = "query")
     })
-    @GetMapping("/orders/items")
-    public ResponseEntity findOrderItems(
+    @GetMapping("/points")
+    public ResponseEntity findMyPoints(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 
         Member loginMember = getLoginMember();
-        return ResponseEntity.ok(cartQueryService.findOrderItemPage(loginMember,pageable));
+
+        return ResponseEntity.ok(pointService.findMyPoints(loginMember,pageable));
     }
 
+    @ApiOperation(value = "포인트 현황 조회",notes = "포인트 현황 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @GetMapping("/points/status")
+    public ResponseEntity findMyPointStatus(){
+
+        Member loginMember = getLoginMember();
+
+        return ResponseEntity.ok(pointService.findMyPointStatus(loginMember));
+    }
 
 
     /**
@@ -89,4 +69,5 @@ public class OrderController {
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
         return loginMember.getMember();
     }
+
 }

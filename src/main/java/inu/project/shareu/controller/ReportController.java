@@ -57,6 +57,7 @@ public class ReportController {
         return ResponseEntity.ok().build();
     }
 
+
     /**
      * 현재 로그인한 사용자를 가져온다.
      */

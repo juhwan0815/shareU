@@ -14,10 +14,14 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "2. 족보")
 @Slf4j
@@ -86,6 +90,24 @@ public class ItemController {
         storeService.deleteStores(item);
 
         return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation(value = "내가 등록한 족보 조회",notes = "내가 등록한 족보 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "page",value = "페이지",required = true
+                    ,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "size",value = "페이징 사이즈",required = true
+                    ,dataType = "int", paramType = "query")
+    })
+    @GetMapping("/members/items")
+    public ResponseEntity findMyItems(
+            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
+            @ApiIgnore Pageable pageable){
+
+        Member loginMember = getLoginMember();
+        return ResponseEntity.ok(itemService.findMyItemPage(loginMember,pageable));
     }
 
     /**

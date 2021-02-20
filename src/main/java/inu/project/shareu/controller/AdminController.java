@@ -1,4 +1,4 @@
-package inu.project.shareu.controller.admin;
+package inu.project.shareu.controller;
 
 import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.config.security.LoginMember;

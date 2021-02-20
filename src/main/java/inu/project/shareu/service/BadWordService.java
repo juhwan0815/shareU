@@ -3,8 +3,11 @@ package inu.project.shareu.service;
 import inu.project.shareu.advice.exception.BadWordException;
 import inu.project.shareu.domain.BadWord;
 import inu.project.shareu.model.request.badword.BadWordSaveRequest;
+import inu.project.shareu.model.response.badword.BadWordResponse;
 import inu.project.shareu.repository.BadWordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +48,17 @@ public class BadWordService {
                 .orElseThrow(() -> new BadWordException("존재하지 않는 금칙어입니다."));
 
         badWordRepository.delete(findBadWord);
+    }
+
+    /**
+     * 금칙어 조회
+     * 1. 금칙어 페이징 조회
+     * 2. DTO로 변환하여 반환
+     * @return Page<BadwordResponse>
+     */
+    public Page<BadWordResponse> findPage(Pageable pageable) {
+        Page<BadWord> badWords = badWordRepository.findAll(pageable);
+        return badWords.map(badWord -> new BadWordResponse(badWord));
     }
 
     /**
@@ -107,5 +121,7 @@ public class BadWordService {
             throw new BadWordException("이미 존재하는 금칙어입니다.");
         }
     }
+
+
 
 }

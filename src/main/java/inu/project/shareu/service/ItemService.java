@@ -6,9 +6,13 @@ import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.domain.*;
 import inu.project.shareu.model.request.item.ItemSaveRequest;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
+import inu.project.shareu.model.response.item.ItemResponse;
 import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.CartQueryRepository;
+import inu.project.shareu.repository.query.ItemQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,7 @@ public class ItemService {
     private final PointRepository pointRepository;
     private final LectureRepository lectureRepository;
     private final CartQueryRepository cartQueryRepository;
+    private final ItemQueryRepository itemQueryRepository;
 
     /**
      * 족보 저장
@@ -122,6 +127,18 @@ public class ItemService {
     }
 
     /**
+     * 내가 올린 족보 페이징 조회
+     * 1. 내가 올린 족보 조회
+     * 2. DTO로 변환해서 반환
+     * @return Page<ItemResponse>
+     */
+    public Page<ItemResponse> findMyItemPage(Member member, Pageable pageable) {
+        Page<Item> items = itemQueryRepository.findPageByMember(member, pageable);
+
+        return items.map(item -> new ItemResponse(item,item.getLecture()));
+    }
+
+    /**
      * 족보를 구매한 사람들 모두 환불 처리
      */
     private void refundPointToOrderMember(Item item) {
@@ -148,4 +165,6 @@ public class ItemService {
             throw new MemberException("족보의 판매자가 아닙니다.");
         }
     }
+
+
 }

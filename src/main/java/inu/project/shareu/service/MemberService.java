@@ -6,14 +6,20 @@ import inu.project.shareu.domain.MemberStatus;
 import inu.project.shareu.domain.Role;
 import inu.project.shareu.model.request.member.MemberLoginRequest;
 import inu.project.shareu.model.request.member.MemberSaveRequest;
+import inu.project.shareu.model.request.member.MemberUpdateRequest;
+import inu.project.shareu.model.response.member.MemberBlockResponse;
+import inu.project.shareu.model.response.member.MemberResponse;
 import inu.project.shareu.repository.MemberRepository;
-import inu.project.shareu.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.awt.color.CMMException;
 import java.util.List;
 
 @Slf4j
@@ -67,6 +73,41 @@ public class MemberService {
         return findMember;
     }
 
+    /**
+     * 회원 정보 수정
+     * 1. 회원 조회
+     * 2. 회원 수정 요청에 변경할 비밀번호가 있는지 확인
+     * -> 회원 수정 요청에 변경할 비밀번호가 있다면 비밀번호 동일여부 및 현재 비밀번호 확인 후 비밀번호,이름 변경
+     * -> 회원 수정 요청에 변경할 비밀번호가 없다면 이름만 변경
+     */
+    @Transactional
+    public void updateMember(Member loginMember,MemberUpdateRequest memberUpdateRequest) {
+
+        Member findMember = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
+
+        if(checkExistUpdatePassword(memberUpdateRequest)){
+
+            validatePasswordSame(memberUpdateRequest.getChangePassword1(),
+                                 memberUpdateRequest.getChangePassword2());
+
+            validateMemberPasswordSame(memberUpdateRequest.getCurrentPassword(),
+                                       findMember.getPassword());
+
+            findMember.changePassword(memberUpdateRequest.getChangePassword1());
+            findMember.changeName(memberUpdateRequest.getName());
+
+        }else {
+
+            validateMemberPasswordSame(memberUpdateRequest.getCurrentPassword(),
+                                       findMember.getPassword());
+
+            findMember.changeName(memberUpdateRequest.getName());
+
+        }
+
+
+    }
 
     /**
      * 회원 탈퇴
@@ -93,6 +134,17 @@ public class MemberService {
         validateBlockMember(findMember);
 
         findMember.changeMemberStatus();
+    }
+
+    /**
+     * 차단된 회원 페이징 조회
+     * 1. 차단된 회원 조회
+     * 2. DTO로 변환하여 반환
+     * @Return Page<MemberBlockResponse>
+     */
+    public Page<MemberBlockResponse> findBlockMembers(Pageable pageable) {
+        Page<Member> blockMembers = memberRepository.findPageByMemberStatus(MemberStatus.BLOCK, pageable);
+        return blockMembers.map(member -> new MemberBlockResponse(member));
     }
 
     /**
@@ -146,4 +198,17 @@ public class MemberService {
             throw new MemberException("차단되지 않은 회원입니다.");
         }
     }
+
+
+    /**
+     * 회원 수정 요청에 변경할 비밀번호 존재 여부 확인
+     */
+    private boolean checkExistUpdatePassword(MemberUpdateRequest memberUpdateRequest) {
+        if(StringUtils.hasText(memberUpdateRequest.getChangePassword1())
+                && StringUtils.hasText(memberUpdateRequest.getChangePassword2())){
+            return true;
+        }
+        return false;
+    }
+
 }

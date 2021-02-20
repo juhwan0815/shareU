@@ -35,7 +35,7 @@ public class OrderService {
      */
     @Transactional
     public void saveBulkOrder(Member loginMember) {
-
+        // TODO 아이템 판매여부 확인
         Member member= memberRepository.findById(loginMember.getId())
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 

@@ -6,12 +6,18 @@ import inu.project.shareu.domain.College;
 import inu.project.shareu.domain.Major;
 import inu.project.shareu.model.request.major.MajorSaveRequest;
 import inu.project.shareu.model.request.major.MajorUpdateRequest;
+import inu.project.shareu.model.response.major.MajorResponse;
 import inu.project.shareu.repository.CollegeRepository;
 import inu.project.shareu.repository.MajorRepository;
 import javassist.compiler.CompileError;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +74,37 @@ public class MajorService {
                 .orElseThrow(() -> new MajorException("존재하지 않는 학과입니다."));
 
         majorRepository.delete(major);
+    }
+
+    /**
+     * 단과대학 소속 전공 조회
+     * 1. 단과대학 조회
+     * 2. 단과대학 소속 전공 조회
+     * 3. DTO로 변환
+     * @Return List<MajorResponse>
+     */
+    public List<MajorResponse> findMajorsByCollegeId(Long collegeId) {
+
+        College findCollege = collegeRepository.findById(collegeId)
+                .orElseThrow(() -> new CollegeException("존재하지 않는 단과대학입니다."));
+
+        List<Major> findMajors = majorRepository.findByCollege(findCollege);
+
+        return findMajors.stream()
+                .map(major -> new MajorResponse(major))
+                .collect(Collectors.toList());
+
+    }
+
+    /**
+     * 전공 페이징 조회
+     * 1. 전공 페이징 조회
+     * 2. DTO로 변환하여 반환
+     * @Return Page<MajorResponse>
+     */
+    public Page<MajorResponse> findMajors(Pageable pageable) {
+        Page<Major> majors = majorRepository.findAll(pageable);
+        return majors.map(major -> new MajorResponse(major));
     }
 
     /**
