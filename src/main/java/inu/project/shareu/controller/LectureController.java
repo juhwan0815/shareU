@@ -1,11 +1,10 @@
 package inu.project.shareu.controller;
 
-import inu.project.shareu.model.request.lecture.LectureSaveRequest;
-import inu.project.shareu.model.request.lecture.LectureUpdateRequest;
-import inu.project.shareu.model.response.common.SuccessListResponse;
-import inu.project.shareu.model.response.common.SuccessResponse;
-import inu.project.shareu.model.response.lecture.LectureNameResponse;
-import inu.project.shareu.model.response.lecture.LectureProfessorResponse;
+import inu.project.shareu.model.lecture.request.LectureSaveRequest;
+import inu.project.shareu.model.lecture.request.LectureUpdateRequest;
+import inu.project.shareu.model.lecture.response.LectureNameResponse;
+import inu.project.shareu.model.lecture.response.LectureProfessorResponse;
+import inu.project.shareu.model.lecture.response.LectureResponse;
 import inu.project.shareu.service.LectureService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -13,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -36,7 +36,7 @@ public class LectureController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/admin/lectures")
-    public ResponseEntity saveLecture(@ModelAttribute LectureSaveRequest lectureSaveRequest){
+    public ResponseEntity<Void> saveLecture(@ModelAttribute LectureSaveRequest lectureSaveRequest){
         lectureService.saveLecture(lectureSaveRequest);
 
         return ResponseEntity.ok().build();
@@ -48,7 +48,7 @@ public class LectureController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/admin/lectures/{lectureId}")
-    public ResponseEntity updateLecture(@PathVariable Long lectureId,
+    public ResponseEntity<Void> updateLecture(@PathVariable Long lectureId,
                                         @ModelAttribute LectureUpdateRequest lectureUpdateRequest){
 
         lectureService.updateLecture(lectureId,lectureUpdateRequest);
@@ -62,7 +62,7 @@ public class LectureController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/admin/lectures/{lectureId}")
-    public ResponseEntity deleteLecture(@PathVariable Long lectureId){
+    public ResponseEntity<Void> deleteLecture(@PathVariable Long lectureId){
 
         lectureService.deleteLecture(lectureId);
 
@@ -79,7 +79,7 @@ public class LectureController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/admin/lectures")
-    public ResponseEntity findLectures(
+    public ResponseEntity<Page<LectureResponse>> findLectures(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
         return ResponseEntity.ok(lectureService.findPage(pageable));
@@ -93,11 +93,12 @@ public class LectureController {
                     ,dataType = "Long", paramType = "query")
     })
     @GetMapping("/lectures/name")
-    public ResponseEntity findLectureName(@RequestParam("majorId") Long majorId){
+    public ResponseEntity<List<LectureNameResponse>> findLectureName(
+            @RequestParam("majorId") Long majorId){
 
         List<LectureNameResponse> result = lectureService.findLectureNameByMajorId(majorId);
 
-        return ResponseEntity.ok(new SuccessListResponse<>(result));
+        return ResponseEntity.ok(result);
     }
 
     @ApiOperation(value = "강의 교수 조회",notes = "강의 교수 조회")
@@ -108,10 +109,11 @@ public class LectureController {
                     ,dataType = "String", paramType = "query")
     })
     @GetMapping("/lecture/professor")
-    public ResponseEntity findLectureProfessor(@RequestParam("lectureName") String lectureName){
+    public ResponseEntity<List<LectureProfessorResponse>> findLectureProfessor(
+            @RequestParam("lectureName") String lectureName){
 
         List<LectureProfessorResponse> result = lectureService.findLectureProfessorByLectureName(lectureName);
 
-        return ResponseEntity.ok(new SuccessResponse<>(result));
+        return ResponseEntity.ok(result);
     }
 }

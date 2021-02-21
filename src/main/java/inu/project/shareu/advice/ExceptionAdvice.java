@@ -1,7 +1,7 @@
 package inu.project.shareu.advice;
 
 import inu.project.shareu.advice.exception.*;
-import inu.project.shareu.model.response.common.ExceptionResponse;
+import inu.project.shareu.model.common.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -7,13 +7,10 @@ import inu.project.shareu.domain.Cart;
 import inu.project.shareu.domain.Item;
 import inu.project.shareu.domain.ItemStatus;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.cart.CartSaveRequest;
+import inu.project.shareu.model.cart.request.CartSaveRequest;
 import inu.project.shareu.repository.CartRepository;
 import inu.project.shareu.repository.ItemRepository;
-import inu.project.shareu.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

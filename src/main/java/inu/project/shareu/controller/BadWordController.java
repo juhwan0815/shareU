@@ -1,6 +1,7 @@
 package inu.project.shareu.controller;
 
-import inu.project.shareu.model.request.badword.BadWordSaveRequest;
+import inu.project.shareu.model.badword.request.BadWordSaveRequest;
+import inu.project.shareu.model.badword.response.BadWordResponse;
 import inu.project.shareu.service.BadWordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -30,7 +32,7 @@ public class BadWordController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/badwords")
-    public ResponseEntity saveBadWord(@ModelAttribute BadWordSaveRequest badWordSaveRequest){
+    public ResponseEntity<Void> saveBadWord(@ModelAttribute BadWordSaveRequest badWordSaveRequest){
 
         badWordService.saveBadWord(badWordSaveRequest);
 
@@ -43,7 +45,7 @@ public class BadWordController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/badwords/{badWordId}")
-    public ResponseEntity deleteBadWord(@PathVariable Long badWordId){
+    public ResponseEntity<Void> deleteBadWord(@PathVariable Long badWordId){
 
         badWordService.deleteBadWord(badWordId);
 
@@ -60,7 +62,7 @@ public class BadWordController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/badwords")
-    public ResponseEntity findBadWords(
+    public ResponseEntity<Page<BadWordResponse>> findBadWords(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
         return ResponseEntity.ok(badWordService.findPage(pageable));

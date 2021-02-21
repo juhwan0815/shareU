@@ -4,11 +4,10 @@ import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.MemberStatus;
 import inu.project.shareu.domain.Role;
-import inu.project.shareu.model.request.member.MemberLoginRequest;
-import inu.project.shareu.model.request.member.MemberSaveRequest;
-import inu.project.shareu.model.request.member.MemberUpdateRequest;
-import inu.project.shareu.model.response.member.MemberBlockResponse;
-import inu.project.shareu.model.response.member.MemberResponse;
+import inu.project.shareu.model.member.request.MemberLoginRequest;
+import inu.project.shareu.model.member.request.MemberSaveRequest;
+import inu.project.shareu.model.member.request.MemberUpdateRequest;
+import inu.project.shareu.model.member.response.MemberBlockResponse;
 import inu.project.shareu.repository.MemberRepository;
 import inu.project.shareu.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.awt.color.CMMException;
 import java.util.List;
 
 @Slf4j
@@ -38,6 +36,7 @@ public class MemberService {
      * 매일 0 시에 족보 등록 가능 회수 초기화
      */
     @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
     public void updateMemberPossibleCount(){
         long count = memberQueryRepository.updateMemberPossibleCount();
         log.info("{}명의 족보 등록 가능 회수를 업데이트 했습니다.",count);

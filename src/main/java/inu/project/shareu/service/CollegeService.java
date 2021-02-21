@@ -1,8 +1,8 @@
 package inu.project.shareu.service;
 
 import inu.project.shareu.domain.College;
-import inu.project.shareu.model.response.college.CollegeResponse;
-import inu.project.shareu.model.response.college.CollegeWithMajorResponse;
+import inu.project.shareu.model.college.response.CollegeResponse;
+import inu.project.shareu.model.college.response.CollegeWithMajorResponse;
 import inu.project.shareu.repository.CollegeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

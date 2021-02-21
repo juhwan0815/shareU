@@ -2,8 +2,8 @@ package inu.project.shareu.service;
 
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Point;
-import inu.project.shareu.model.response.point.PointResponse;
-import inu.project.shareu.model.response.point.PointStatusResponse;
+import inu.project.shareu.model.point.response.PointResponse;
+import inu.project.shareu.model.point.response.PointStatusResponse;
 import inu.project.shareu.repository.PointRepository;
 import inu.project.shareu.repository.query.PointQueryRepository;
 import lombok.RequiredArgsConstructor;

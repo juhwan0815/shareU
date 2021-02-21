@@ -2,7 +2,8 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.cart.CartSaveRequest;
+import inu.project.shareu.model.cart.request.CartSaveRequest;
+import inu.project.shareu.model.cart.response.CartResponse;
 import inu.project.shareu.service.CartService;
 import inu.project.shareu.service.query.CartQueryService;
 import io.swagger.annotations.Api;
@@ -11,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -36,7 +38,7 @@ public class CartController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/carts")
-    public ResponseEntity saveCart(@ModelAttribute CartSaveRequest cartSaveRequest){
+    public ResponseEntity<Void> saveCart(@ModelAttribute CartSaveRequest cartSaveRequest){
 
         Member member = getLoginMember();
 
@@ -52,7 +54,7 @@ public class CartController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/carts/{cartId}")
-    public ResponseEntity deleteCart(@PathVariable Long cartId){
+    public ResponseEntity<Void> deleteCart(@PathVariable Long cartId){
 
         Member member = getLoginMember();
 
@@ -71,7 +73,7 @@ public class CartController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/carts")
-    public ResponseEntity findCarts(
+    public ResponseEntity<Page<CartResponse>> findCarts(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 

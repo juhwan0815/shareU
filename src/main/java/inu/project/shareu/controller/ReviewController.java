@@ -2,11 +2,9 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.item.ItemSearchCondition;
-import inu.project.shareu.model.request.review.ReviewSaveRequest;
-import inu.project.shareu.model.request.review.ReviewUpdateRequest;
-import inu.project.shareu.model.response.item.ItemSearchResponse;
-import inu.project.shareu.model.response.review.ReviewResponse;
+import inu.project.shareu.model.review.request.ReviewSaveRequest;
+import inu.project.shareu.model.review.request.ReviewUpdateRequest;
+import inu.project.shareu.model.review.response.ReviewResponse;
 import inu.project.shareu.service.BadWordService;
 import inu.project.shareu.service.ReviewService;
 import io.swagger.annotations.Api;
@@ -40,7 +38,7 @@ public class ReviewController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/reviews")
-    public ResponseEntity saveReview(@ModelAttribute ReviewSaveRequest reviewSaveRequest) {
+    public ResponseEntity<Void> saveReview(@ModelAttribute ReviewSaveRequest reviewSaveRequest) {
 
         Member member = getLoginMember();
 
@@ -57,7 +55,7 @@ public class ReviewController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/reviews/{reviewId}")
-    public ResponseEntity updateReview(@PathVariable Long reviewId,
+    public ResponseEntity<Void> updateReview(@PathVariable Long reviewId,
                                        @ModelAttribute ReviewUpdateRequest reviewUpdateRequest) {
 
         Member member = getLoginMember();
@@ -75,7 +73,7 @@ public class ReviewController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/reviews/{reviewId}")
-    public ResponseEntity deleteReview(@PathVariable Long reviewId){
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId){
 
         Member member = getLoginMember();
 
@@ -90,7 +88,7 @@ public class ReviewController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/admin/reviews/{reviewId}")
-    public ResponseEntity deleteReviewByAdmin(@PathVariable Long reviewId){
+    public ResponseEntity<Void> deleteReviewByAdmin(@PathVariable Long reviewId){
 
         reviewService.deleteReviewByAdmin(reviewId);
 
@@ -107,7 +105,7 @@ public class ReviewController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/items/{itemId}/reviews")
-    public ResponseEntity findReviewPage(
+    public ResponseEntity<Page<ReviewResponse>> findReviewPage(
             @PathVariable Long itemId,
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){

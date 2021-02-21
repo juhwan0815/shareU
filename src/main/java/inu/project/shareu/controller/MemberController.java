@@ -3,12 +3,12 @@ package inu.project.shareu.controller;
 import inu.project.shareu.config.security.JwtTokenProvider;
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.member.MemberLoginRequest;
-import inu.project.shareu.model.request.member.MemberSaveRequest;
-import inu.project.shareu.model.request.member.MemberUpdateRequest;
-import inu.project.shareu.model.response.common.SuccessResponse;
-import inu.project.shareu.model.response.member.MemberLoginResponse;
-import inu.project.shareu.model.response.member.MemberResponse;
+import inu.project.shareu.model.member.request.MemberLoginRequest;
+import inu.project.shareu.model.member.request.MemberSaveRequest;
+import inu.project.shareu.model.member.request.MemberUpdateRequest;
+import inu.project.shareu.model.member.response.MemberAuthResponse;
+import inu.project.shareu.model.member.response.MemberBlockResponse;
+import inu.project.shareu.model.member.response.MemberResponse;
 import inu.project.shareu.service.BadWordService;
 import inu.project.shareu.service.MemberService;
 import io.swagger.annotations.Api;
@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.connector.Response;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -39,7 +39,7 @@ public class MemberController {
 
     @ApiOperation(value = "회원가입",notes = "회원 가입")
     @PostMapping("/members")
-    public ResponseEntity saveMember(@ModelAttribute MemberSaveRequest memberSaveRequest) {
+    public ResponseEntity<Void> saveMember(@ModelAttribute MemberSaveRequest memberSaveRequest) {
 
         badWordService.validateItemForbiddenWord(memberSaveRequest.getName());
         memberService.saveMember(memberSaveRequest);
@@ -49,13 +49,13 @@ public class MemberController {
 
     @ApiOperation(value = "회원 로그인",notes = "회원 로그인")
     @PostMapping("/members/login")
-    public ResponseEntity loginMember(@ModelAttribute MemberLoginRequest memberLoginRequest) {
+    public ResponseEntity<MemberAuthResponse> loginMember(@ModelAttribute MemberLoginRequest memberLoginRequest) {
 
         Member loginMember = memberService.loginMember(memberLoginRequest);
 
         String token = "Bearer "+ jwtTokenProvider.createToken(String.valueOf(loginMember.getId()));
 
-        return ResponseEntity.ok(new SuccessResponse<>(token));
+        return ResponseEntity.ok(new MemberAuthResponse(token));
     }
 
 
@@ -65,7 +65,7 @@ public class MemberController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/members")
-    public ResponseEntity updateMember(@ModelAttribute MemberUpdateRequest memberUpdateRequest){
+    public ResponseEntity<Void> updateMember(@ModelAttribute MemberUpdateRequest memberUpdateRequest){
 
         Member loginMember = getLoginMember();
 
@@ -81,7 +81,7 @@ public class MemberController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/members")
-    public ResponseEntity removeMember(){
+    public ResponseEntity<Void> removeMember(){
 
         Member loginMember = getLoginMember();
         memberService.removeMember(loginMember);
@@ -97,7 +97,7 @@ public class MemberController {
                     ,dataType = "String", paramType = "header")
     })
     @GetMapping("/members")
-    public ResponseEntity findLoginMember(){
+    public ResponseEntity<MemberResponse> findLoginMember(){
 
         Member loginMember = getLoginMember();
 
@@ -114,7 +114,7 @@ public class MemberController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/admin/members")
-    public ResponseEntity findBlockMember(
+    public ResponseEntity<Page<MemberBlockResponse>> findBlockMember(
             @PageableDefault(size = 15,sort = "id",direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
         return ResponseEntity.ok(memberService.findBlockMembers(pageable));
@@ -126,7 +126,7 @@ public class MemberController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/admin/members/{memberId}")
-    public ResponseEntity changeMemberStatus(@PathVariable Long memberId){
+    public ResponseEntity<Void> changeMemberStatus(@PathVariable Long memberId){
 
         memberService.changeMemberStatus(memberId);
 

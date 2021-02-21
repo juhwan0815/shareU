@@ -3,12 +3,12 @@ package inu.project.shareu.controller;
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Item;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.item.ItemSaveRequest;
-import inu.project.shareu.model.request.item.ItemSearchCondition;
-import inu.project.shareu.model.request.item.ItemUpdateRequest;
-import inu.project.shareu.model.response.common.SuccessResponse;
-import inu.project.shareu.model.response.item.ItemDetailResponse;
-import inu.project.shareu.model.response.item.ItemSearchResponse;
+import inu.project.shareu.model.item.request.ItemSaveRequest;
+import inu.project.shareu.model.item.request.ItemSearchCondition;
+import inu.project.shareu.model.item.request.ItemUpdateRequest;
+import inu.project.shareu.model.item.response.ItemDetailResponse;
+import inu.project.shareu.model.item.response.ItemResponse;
+import inu.project.shareu.model.item.response.ItemSearchResponse;
 import inu.project.shareu.service.BadWordService;
 import inu.project.shareu.service.ItemService;
 import inu.project.shareu.service.StoreService;
@@ -44,7 +44,7 @@ public class ItemController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/items")
-    public ResponseEntity saveItem(@ModelAttribute ItemSaveRequest itemSaveRequest){
+    public ResponseEntity<Void> saveItem(@ModelAttribute ItemSaveRequest itemSaveRequest){
 
         // TODO 파일 타입 체크
 
@@ -67,7 +67,7 @@ public class ItemController {
                     ,dataType = "String", paramType = "header")
     })
     @PatchMapping("/items/{itemId}")
-    public ResponseEntity updateItem(@PathVariable Long itemId,
+    public ResponseEntity<Void> updateItem(@PathVariable Long itemId,
                                      @ModelAttribute ItemUpdateRequest itemUpdateRequest){
 
         // TODO 파일 수정은 어떻게?
@@ -87,7 +87,7 @@ public class ItemController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/items/{itemId}")
-    public ResponseEntity deleteItem(@PathVariable Long itemId){
+    public ResponseEntity<Void> deleteItem(@PathVariable Long itemId){
 
         Member member = getLoginMember();
 
@@ -103,7 +103,7 @@ public class ItemController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/admin/items/{itemId}")
-    public ResponseEntity deleteItemByAdmin(@PathVariable Long itemId){
+    public ResponseEntity<Void> deleteItemByAdmin(@PathVariable Long itemId){
 
         Item item = itemService.deleteItemByAdmin(itemId);
         storeService.deleteStores(item);
@@ -121,7 +121,7 @@ public class ItemController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/members/items")
-    public ResponseEntity findMyItems(
+    public ResponseEntity<Page<ItemResponse>> findMyItems(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 
@@ -135,11 +135,12 @@ public class ItemController {
                     ,dataType = "String", paramType = "header")
     })
     @GetMapping("/items/{itemId}")
-    public ResponseEntity findItemById(@PathVariable Long itemId){
+    public ResponseEntity<ItemDetailResponse> findItemById(
+            @PathVariable Long itemId){
 
         ItemDetailResponse itemDetail = itemService.findItemById(itemId);
 
-        return ResponseEntity.ok(new SuccessResponse<>(itemDetail));
+        return ResponseEntity.ok(itemDetail);
     }
 
     @ApiOperation(value = "족보 페이징 조회",notes = "족보 페이징 조회")
@@ -152,8 +153,9 @@ public class ItemController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/items")
-    public ResponseEntity findItemPage(ItemSearchCondition itemSearchCondition,
-                                       Pageable pageable){
+    public ResponseEntity<Page<ItemSearchResponse>> findItemPage(
+            ItemSearchCondition itemSearchCondition,
+            Pageable pageable){
 
         Page<ItemSearchResponse> results = itemService.findItemByItemSearchCondition(itemSearchCondition, pageable);
 

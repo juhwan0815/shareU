@@ -9,7 +9,7 @@ import com.amazonaws.util.IOUtils;
 import inu.project.shareu.advice.exception.CartException;
 import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.domain.*;
-import inu.project.shareu.model.common.store.StoreDto;
+import inu.project.shareu.model.store.StoreDto;
 import inu.project.shareu.repository.CartRepository;
 import inu.project.shareu.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;

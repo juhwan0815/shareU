@@ -4,7 +4,7 @@ import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Store;
-import inu.project.shareu.model.common.store.StoreDto;
+import inu.project.shareu.model.store.StoreDto;
 import inu.project.shareu.service.StoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -16,7 +16,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +37,7 @@ public class StoreController {
     })
     @DeleteMapping("/store/{storeId}")
     @ResponseBody
-    public ResponseEntity removeStore(@PathVariable Long storeId){
+    public ResponseEntity<Void> removeStore(@PathVariable Long storeId){
 
         Member member = getLoginMember();
         storeService.deleteStore(member,storeId);

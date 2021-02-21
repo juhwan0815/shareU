@@ -2,9 +2,9 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.request.report.ReportItemSaveRequest;
-import inu.project.shareu.model.request.report.ReportReviewSaveRequest;
-import inu.project.shareu.model.response.report.ReportResponse;
+import inu.project.shareu.model.report.request.ReportItemSaveRequest;
+import inu.project.shareu.model.report.request.ReportReviewSaveRequest;
+import inu.project.shareu.model.report.response.ReportResponse;
 import inu.project.shareu.service.ReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -36,7 +36,7 @@ public class ReportController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/reports/item/{itemId}")
-    public ResponseEntity saveReportItem(@PathVariable Long itemId,
+    public ResponseEntity<Void> saveReportItem(@PathVariable Long itemId,
                                          @ModelAttribute ReportItemSaveRequest reportItemSaveRequest){
 
         Member member = getLoginMember();
@@ -52,7 +52,7 @@ public class ReportController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/reports/review/{reviewId}")
-    public ResponseEntity saveReportReview(@PathVariable Long reviewId,
+    public ResponseEntity<Void> saveReportReview(@PathVariable Long reviewId,
                                            @ModelAttribute ReportReviewSaveRequest reportReviewSaveRequest){
 
         Member member = getLoginMember();
@@ -68,7 +68,7 @@ public class ReportController {
                     ,dataType = "String", paramType = "header")
     })
     @DeleteMapping("/admin/reports/{reportId}")
-    public ResponseEntity deleteReport(@PathVariable Long reportId){
+    public ResponseEntity<Void> deleteReport(@PathVariable Long reportId){
 
         reportService.deleteReport(reportId);
 
@@ -85,7 +85,7 @@ public class ReportController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/admin/reports")
-    public ResponseEntity findPage(
+    public ResponseEntity<Page<ReportResponse>> findPage(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 

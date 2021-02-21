@@ -6,7 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import inu.project.shareu.advice.exception.ItemException;
 import inu.project.shareu.domain.*;
-import inu.project.shareu.model.request.item.ItemSearchCondition;
+import inu.project.shareu.model.item.request.ItemSearchCondition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

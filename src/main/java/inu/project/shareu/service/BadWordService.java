@@ -2,8 +2,8 @@ package inu.project.shareu.service;
 
 import inu.project.shareu.advice.exception.BadWordException;
 import inu.project.shareu.domain.BadWord;
-import inu.project.shareu.model.request.badword.BadWordSaveRequest;
-import inu.project.shareu.model.response.badword.BadWordResponse;
+import inu.project.shareu.model.badword.request.BadWordSaveRequest;
+import inu.project.shareu.model.badword.response.BadWordResponse;
 import inu.project.shareu.repository.BadWordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

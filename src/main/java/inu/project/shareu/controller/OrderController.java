@@ -2,6 +2,7 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
+import inu.project.shareu.model.item.response.ItemOrderResponse;
 import inu.project.shareu.service.OrderService;
 import inu.project.shareu.service.query.CartQueryService;
 import io.swagger.annotations.Api;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -37,7 +39,7 @@ public class OrderController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/orders")
-    public ResponseEntity saveBulkOrder(){
+    public ResponseEntity<Void> saveBulkOrder(){
 
         Member member = getLoginMember();
 
@@ -52,7 +54,7 @@ public class OrderController {
                     ,dataType = "String", paramType = "header")
     })
     @PostMapping("/orders/items/{itemId}")
-    public ResponseEntity saveSingleOrder(@PathVariable Long itemId){
+    public ResponseEntity<Void> saveSingleOrder(@PathVariable Long itemId){
 
         Member member = getLoginMember();
 
@@ -71,7 +73,7 @@ public class OrderController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/orders/items")
-    public ResponseEntity findOrderItems(
+    public ResponseEntity<Page<ItemOrderResponse>> findOrderItems(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 

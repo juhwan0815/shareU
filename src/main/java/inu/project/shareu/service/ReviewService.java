@@ -1,22 +1,19 @@
 package inu.project.shareu.service;
 
 import inu.project.shareu.advice.exception.*;
-import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.*;
-import inu.project.shareu.model.request.review.ReviewSaveRequest;
-import inu.project.shareu.model.request.review.ReviewUpdateRequest;
-import inu.project.shareu.model.response.review.ReviewResponse;
+import inu.project.shareu.model.review.request.ReviewSaveRequest;
+import inu.project.shareu.model.review.request.ReviewUpdateRequest;
+import inu.project.shareu.model.review.response.ReviewResponse;
 import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

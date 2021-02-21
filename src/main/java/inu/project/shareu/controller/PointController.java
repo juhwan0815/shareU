@@ -2,8 +2,8 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
-import inu.project.shareu.model.response.common.SuccessResponse;
-import inu.project.shareu.model.response.point.PointStatusResponse;
+import inu.project.shareu.model.point.response.PointResponse;
+import inu.project.shareu.model.point.response.PointStatusResponse;
 import inu.project.shareu.service.PointService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -39,7 +40,7 @@ public class PointController {
                     ,dataType = "int", paramType = "query")
     })
     @GetMapping("/points")
-    public ResponseEntity findMyPoints(
+    public ResponseEntity<Page<PointResponse>> findMyPoints(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 
@@ -54,13 +55,13 @@ public class PointController {
                     ,dataType = "String", paramType = "header")
     })
     @GetMapping("/points/status")
-    public ResponseEntity findMyPointStatus(){
+    public ResponseEntity<PointStatusResponse> findMyPointStatus(){
 
         Member loginMember = getLoginMember();
 
         PointStatusResponse myPointStatus = pointService.findMyPointStatus(loginMember);
 
-        return ResponseEntity.ok(new SuccessResponse<>(myPointStatus));
+        return ResponseEntity.ok(myPointStatus);
     }
 
 
