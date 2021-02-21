@@ -1,6 +1,7 @@
 package inu.project.shareu.controller;
 
 import inu.project.shareu.model.response.college.CollegeResponse;
+import inu.project.shareu.model.response.college.CollegeWithMajorResponse;
 import inu.project.shareu.model.response.common.SuccessListResponse;
 import inu.project.shareu.service.CollegeService;
 import io.swagger.annotations.Api;
@@ -33,5 +34,19 @@ public class CollegeController {
 
         return ResponseEntity.ok(new SuccessListResponse<>(result));
     }
+
+    @ApiOperation(value = "단과대학 및 소속 학과 조회",notes = "단과대학 및 소속 학과 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @GetMapping("/colleges/majors")
+    public ResponseEntity findCollegesWithMajors(){
+
+        List<CollegeWithMajorResponse> result = collegeService.findAllWithMajors();
+
+        return ResponseEntity.ok(new SuccessListResponse<>(result));
+    }
+
 
 }

@@ -10,10 +10,12 @@ import inu.project.shareu.model.request.member.MemberUpdateRequest;
 import inu.project.shareu.model.response.member.MemberBlockResponse;
 import inu.project.shareu.model.response.member.MemberResponse;
 import inu.project.shareu.repository.MemberRepository;
+import inu.project.shareu.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,17 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberQueryRepository memberQueryRepository;
+
+    /**
+     * 매일 0 시에 족보 등록 가능 회수 초기화
+     */
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateMemberPossibleCount(){
+        long count = memberQueryRepository.updateMemberPossibleCount();
+        log.info("{}명의 족보 등록 가능 회수를 업데이트 했습니다.",count);
+    }
+
 
     /**
      * 회원 저장

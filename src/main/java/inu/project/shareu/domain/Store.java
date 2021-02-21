@@ -25,21 +25,16 @@ public class Store extends BaseEntity {
 
     private String fileContentType;
 
-    @Column(columnDefinition = "TEXT")
-    private String resourcePath;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    public static Store creatStore(MultipartFile file, String storeName,
-                                   String resourcePath,Item item){
+    public static Store creatStore(MultipartFile file, String storeName, Item item){
         Store store = new Store();
         store.fileOriginalName = file.getOriginalFilename();
         store.fileStoreName = storeName;
         store.fileContentType = file.getContentType();
         store.fileSize = file.getSize();
-        store.resourcePath = resourcePath;
         store.item = item;
         return store;
     }

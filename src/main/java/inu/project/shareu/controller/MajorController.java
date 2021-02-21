@@ -88,11 +88,11 @@ public class MajorController {
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "collegeId",value = "단과 대학 Id",required = true
-                    ,dataType = "Long", paramType = "query")
+                    ,dataType = "Long", paramType = "path")
     })
-    @GetMapping("/majors")
+    @GetMapping("/college/{collegeId}/majors")
     public ResponseEntity findMajorsByCollegeId(
-            @ApiIgnore @RequestParam("collegeId") Long collegeId){
+            @ApiIgnore @PathVariable("collegeId") Long collegeId){
 
         List<MajorResponse> result = majorService.findMajorsByCollegeId(collegeId);
 

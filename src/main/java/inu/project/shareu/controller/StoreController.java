@@ -16,13 +16,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-@Api(tags = "7 .파일")
+@Api(tags = "8.파일")
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -50,12 +51,37 @@ public class StoreController {
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
                     ,dataType = "String", paramType = "header")
     })
-    @GetMapping("/store")
-    public ResponseEntity<ByteArrayResource> getResourcePath(@RequestParam("storeName") String storeName){
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<ByteArrayResource> getResourcePath(@PathVariable Long storeId){
 
         Member member = getLoginMember();
 
-        StoreDto storeDto = storeService.downloadFile(member,storeName);
+        StoreDto storeDto = storeService.downloadFile(member,storeId);
+        Store store = storeDto.getStore();
+        byte[] data = storeDto.getData();
+
+        String fileOriginalName = store.getFileOriginalName();
+        String encordedFilename = getEncodedFileOriginalName(fileOriginalName);
+
+        ByteArrayResource resource = new ByteArrayResource(data);
+
+        return ResponseEntity
+                .ok()
+                .contentLength(data.length)
+                .header("Content-type","application/octet-stream")
+                .header("Content-disposition","attachment; filename=\"" + encordedFilename + "\"")
+                .body(resource);
+    }
+
+    @ApiOperation(value = "(관리자) 파일 다운",notes = "(관리자) 파일 다운")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @GetMapping("/admin/store/{storeId}")
+    public ResponseEntity<ByteArrayResource> getResourcePathByAdmin(@PathVariable Long storeId){
+
+        StoreDto storeDto = storeService.downloadFileByAdmin(storeId);
         Store store = storeDto.getStore();
         byte[] data = storeDto.getData();
 

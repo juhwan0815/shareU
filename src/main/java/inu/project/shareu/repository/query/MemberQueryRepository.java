@@ -32,4 +32,12 @@ public class MemberQueryRepository {
 
         return adminMembers;
     }
+
+    public long updateMemberPossibleCount() {
+        long count = queryFactory
+                .update(member)
+                .set(member.possibleCount,5)
+                .execute();
+        return count;
+    }
 }

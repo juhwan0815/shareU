@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,6 +22,9 @@ public class College {
 
     @Enumerated(EnumType.STRING)
     private CollegeStatus status;
+
+    @OneToMany(mappedBy = "college")
+    private List<Major> majors = new ArrayList<>();
 
     public static College createCollege(String name,CollegeStatus status){
         College college = new College();

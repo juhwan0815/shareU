@@ -21,7 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "4. 장바구니")
+@Api(tags = "4.장바구니")
 @Slf4j
 @Controller
 @RequiredArgsConstructor

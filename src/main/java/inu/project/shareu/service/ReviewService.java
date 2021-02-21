@@ -5,8 +5,12 @@ import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.*;
 import inu.project.shareu.model.request.review.ReviewSaveRequest;
 import inu.project.shareu.model.request.review.ReviewUpdateRequest;
+import inu.project.shareu.model.response.review.ReviewResponse;
 import inu.project.shareu.repository.*;
+import inu.project.shareu.repository.query.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
     private final PointRepository pointRepository;
+    private final ReviewQueryRepository reviewQueryRepository;
 
     /**
      * 리뷰 등록
@@ -66,7 +71,7 @@ public class ReviewService {
     public void updateReview(Long reviewId, Member member,
                              ReviewUpdateRequest reviewUpdateRequest) {
 
-        Review findReview = reviewRepository.findById(reviewId)
+        Review findReview = reviewRepository.findWithItemById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
         validateReviewOwner(member, findReview);
@@ -76,7 +81,7 @@ public class ReviewService {
     }
 
     /**
-     * 리뷰 삭제
+     * 관리자 리뷰 삭제
      * 1. 리뷰 조회
      * 2. 리뷰 작성자 포인트 초기화
      * 3. 포인트 초기화 이력 생성 및 저장
@@ -85,7 +90,7 @@ public class ReviewService {
     @Transactional
     public void deleteReviewByAdmin(Long reviewId){
 
-        Review findReview = reviewRepository.findWithMemberById(reviewId)
+        Review findReview = reviewRepository.findWithMemberAndItemById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
         int changePoint = findReview.getMember().getChangePoint();
@@ -107,12 +112,29 @@ public class ReviewService {
     @Transactional
     public void deleteReview(Long reviewId, Member member) {
 
-        Review findReview = reviewRepository.findById(reviewId)
+        Review findReview = reviewRepository.findWithItemById(reviewId)
                 .orElseThrow(() -> new ReviewException("존재하지 않는 리뷰입니다."));
 
         validateReviewOwner(member,findReview);
 
         findReview.changeStatus();
+    }
+
+    /**
+     * 족보로 리뷰 페이징 조회
+     * 1. 족보 조회
+     * 2. 리뷰 페이징 조회
+     * 3. Dto로 변환하여 반환
+     * @Return Page<ReviewResponse>
+     */
+    public Page<ReviewResponse> findReviewPageByItemId(Long itemId, Pageable pageable) {
+
+        Item findItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemException("존재하지 않는 족보입니다."));
+
+        Page<Review> reviews = reviewQueryRepository
+                .findPageWithMemberByItem(findItem,ReviewStatus.LIVE,pageable);
+        return reviews.map(review -> new ReviewResponse(review));
     }
 
     /**
@@ -144,4 +166,5 @@ public class ReviewService {
             throw new ReviewException("이미 족보에 대한 리뷰를 작성하였습니다.");
         }
     }
+
 }

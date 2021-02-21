@@ -6,13 +6,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "예외처리")
+@ApiIgnore
 @RestController
 @RequestMapping("/exception")
 public class ExceptionController {
 
-    // TODO 알수없다 머냐?
     @RequestMapping("/entrypoint")
     public void entryPointException(){
         throw new AuthenticationEntryPointException("로그인이 필요한 서비스입니다.");

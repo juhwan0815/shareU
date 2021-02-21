@@ -4,7 +4,11 @@ import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Item;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.model.request.item.ItemSaveRequest;
+import inu.project.shareu.model.request.item.ItemSearchCondition;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
+import inu.project.shareu.model.response.common.SuccessResponse;
+import inu.project.shareu.model.response.item.ItemDetailResponse;
+import inu.project.shareu.model.response.item.ItemSearchResponse;
 import inu.project.shareu.service.BadWordService;
 import inu.project.shareu.service.ItemService;
 import inu.project.shareu.service.StoreService;
@@ -14,6 +18,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,7 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "2. 족보")
+@Api(tags = "2.족보")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -92,6 +97,20 @@ public class ItemController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation(value = "관리자 족보 삭제",notes = "관리자 족보 삭제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @DeleteMapping("/admin/items/{itemId}")
+    public ResponseEntity deleteItemByAdmin(@PathVariable Long itemId){
+
+        Item item = itemService.deleteItemByAdmin(itemId);
+        storeService.deleteStores(item);
+
+        return ResponseEntity.ok().build();
+    }
+
     @ApiOperation(value = "내가 등록한 족보 조회",notes = "내가 등록한 족보 조회")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
@@ -108,6 +127,37 @@ public class ItemController {
 
         Member loginMember = getLoginMember();
         return ResponseEntity.ok(itemService.findMyItemPage(loginMember,pageable));
+    }
+
+    @ApiOperation(value = "족보 상세 조회",notes = "족보 상세 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @GetMapping("/items/{itemId}")
+    public ResponseEntity findItemById(@PathVariable Long itemId){
+
+        ItemDetailResponse itemDetail = itemService.findItemById(itemId);
+
+        return ResponseEntity.ok(new SuccessResponse<>(itemDetail));
+    }
+
+    @ApiOperation(value = "족보 페이징 조회",notes = "족보 페이징 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "page",value = "페이지",required = true
+                    ,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "size",value = "페이징 사이즈",required = true
+                    ,dataType = "int", paramType = "query")
+    })
+    @GetMapping("/items")
+    public ResponseEntity findItemPage(ItemSearchCondition itemSearchCondition,
+                                       Pageable pageable){
+
+        Page<ItemSearchResponse> results = itemService.findItemByItemSearchCondition(itemSearchCondition, pageable);
+
+        return ResponseEntity.ok(results);
     }
 
     /**

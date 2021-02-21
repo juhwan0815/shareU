@@ -30,6 +30,9 @@ public class Member extends BaseEntity {
     private int count;
 
     @Column(nullable = false)
+    private int possibleCount;
+
+    @Column(nullable = false)
     private int currentPoint;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -46,6 +49,7 @@ public class Member extends BaseEntity {
         member.studentNumber = studentNumber;
         member.password = password;
         member.name = name;
+        member.possibleCount = 5;
         member.count = 3;
         member.currentPoint = 10;
         member.memberStatus = MemberStatus.ACTIVITY;
@@ -86,6 +90,13 @@ public class Member extends BaseEntity {
         }
         if (count == 0) {
             memberStatus = MemberStatus.BLOCK;
+        }
+    }
+
+    public void changePossibleCount() {
+        this.possibleCount -= 1;
+        if(possibleCount < 0){
+            throw new MemberException("족보는 하루에 5개까지 등록가능합니다.");
         }
     }
 }

@@ -20,6 +20,10 @@ public class Item extends BaseEntity{
 
     private String itemContents;
 
+    private int recommend;
+
+    private int notRecommend;
+
     @Enumerated(EnumType.STRING)
     private ItemStatus itemstatus;
 
@@ -47,9 +51,14 @@ public class Item extends BaseEntity{
         item.itemContents = itemContents;
         item.lecture = lecture ;
         item.itemstatus = ItemStatus.SALE;
+        item.recommend = 0;
+        item.notRecommend = 0;
         item.price = 3;
         item.major = major;
         item.member = member;
+
+        member.changePossibleCount();
+
         return item;
     }
 
@@ -67,5 +76,21 @@ public class Item extends BaseEntity{
         member.changeCount();
         int changePoint = member.getChangePoint();
         return changePoint;
+    }
+
+    public void plusRecommend() {
+        this.recommend += 1;
+    }
+
+    public void plusNotRecommend() {
+        this.notRecommend += 1;
+    }
+
+    public void minusNotRecommend() {
+        this.notRecommend -= 1;
+    }
+
+    public void minusRecommend() {
+        this.recommend -= 1;
     }
 }

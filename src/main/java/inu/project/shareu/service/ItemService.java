@@ -5,8 +5,11 @@ import inu.project.shareu.advice.exception.LectureException;
 import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.domain.*;
 import inu.project.shareu.model.request.item.ItemSaveRequest;
+import inu.project.shareu.model.request.item.ItemSearchCondition;
 import inu.project.shareu.model.request.item.ItemUpdateRequest;
+import inu.project.shareu.model.response.item.ItemDetailResponse;
 import inu.project.shareu.model.response.item.ItemResponse;
+import inu.project.shareu.model.response.item.ItemSearchResponse;
 import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.CartQueryRepository;
 import inu.project.shareu.repository.query.ItemQueryRepository;
@@ -166,5 +169,32 @@ public class ItemService {
         }
     }
 
+    /**
+     * 족보 판매 여부 확인
+     */
+    private void validateItemStatus(Item item) {
+        if(!item.getItemstatus().equals(ItemStatus.SALE)){
+            throw new ItemException("판매가 중지된 족보입니다.");
+        }
+    }
 
+    /**
+     * 족보 상세 조회
+     * 1. 족보 상세 조회
+     * 2. 판매중인 족보인지 확인
+     * 3.
+     */
+    public ItemDetailResponse findItemById(Long itemId) {
+        Item findItem = itemQueryRepository.findWithMajorAndLectureAndStoreAndCollegeById(itemId);
+
+        validateItemStatus(findItem);
+
+        return new ItemDetailResponse(findItem);
+    }
+
+
+    public Page<ItemSearchResponse> findItemByItemSearchCondition(ItemSearchCondition itemSearchCondition, Pageable pageable) {
+        Page<Item> items = itemQueryRepository.findWithLectureByItemSearchCondition(itemSearchCondition, pageable);
+        return items.map(item -> new ItemSearchResponse(item,item.getLecture()));
+    }
 }

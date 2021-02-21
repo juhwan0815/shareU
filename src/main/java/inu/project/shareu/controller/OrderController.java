@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "5. 구매")
+@Api(tags = "5.구매")
 @Slf4j
 @Controller
 @RequiredArgsConstructor

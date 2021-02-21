@@ -43,8 +43,10 @@ public class Review extends BaseEntity {
 
         if(recommend){
             review.recommendStatus = RecommendStatus.GOOD;
+            item.plusRecommend();
         }else {
             review.recommendStatus = RecommendStatus.BAD;
+            item.plusNotRecommend();
         }
 
         return review;
@@ -54,8 +56,16 @@ public class Review extends BaseEntity {
     public void updateReview(String reviewContents, Boolean recommend) {
 
         if(recommend){
+            if(recommendStatus.equals(RecommendStatus.BAD)){
+                item.plusRecommend();
+                item.minusNotRecommend();
+            }
             this.recommendStatus = RecommendStatus.GOOD;
         }else{
+            if(recommendStatus.equals(RecommendStatus.GOOD)){
+                item.minusRecommend();
+                item.plusNotRecommend();
+            }
             this.recommendStatus = RecommendStatus.BAD;
         }
 
@@ -64,5 +74,12 @@ public class Review extends BaseEntity {
 
     public void changeStatus() {
         this.status = ReviewStatus.DELETE;
+
+        if(recommendStatus.equals(RecommendStatus.BAD)){
+            item.minusNotRecommend();
+        }else{
+            item.minusRecommend();
+        }
+
     }
 }

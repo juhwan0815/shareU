@@ -69,9 +69,7 @@ public class StoreService {
 
             removeNewFile(uploadFile);
 
-            String resourcePath = amazonS3Client.getUrl(bucket, storeName).toString();
-
-            Store store = Store.creatStore(file, storeName, resourcePath,item);
+            Store store = Store.creatStore(file, storeName,item);
             storeRepository.save(store);
         }
     }
@@ -119,9 +117,9 @@ public class StoreService {
      * 3. S3에서 파일을 가져오고 바이트로 변환
      * @Return byte[]
      */
-    public StoreDto downloadFile(Member member, String storeName){
+    public StoreDto downloadFile(Member member, Long storeId){
 
-        Store store = storeRepository.findWithItemByFileStoreName(storeName)
+        Store store = storeRepository.findWithItemById(storeId)
                 .orElseThrow(() -> new StoreException("존재하지 않는 파일입니다."));
 
         validateItemPurchase(member, store.getItem());
@@ -135,9 +133,9 @@ public class StoreService {
      * 3. S3에서 파일을 가져오고 바이트로 변환
      * @Return byte[]
      */
-    public StoreDto downloadFileByAdmin(String storeName) {
+    public StoreDto downloadFileByAdmin(Long storeId) {
 
-        Store store = storeRepository.findWithItemByFileStoreName(storeName)
+        Store store = storeRepository.findWithItemById(storeId)
                 .orElseThrow(() -> new StoreException("존재하지 않는 파일입니다."));
 
         return new StoreDto(store,fileDownload(store));

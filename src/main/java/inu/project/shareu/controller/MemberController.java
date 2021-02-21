@@ -27,7 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = {"1. 회원"})
+@Api(tags = {"1.회원"})
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -118,6 +118,19 @@ public class MemberController {
             @PageableDefault(size = 15,sort = "id",direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
         return ResponseEntity.ok(memberService.findBlockMembers(pageable));
+    }
+
+    @ApiOperation(value = "관리자 회원 차단 해제",notes = "관리자 회원 차단 해제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
+                    ,dataType = "String", paramType = "header")
+    })
+    @PatchMapping("/admin/members/{memberId}")
+    public ResponseEntity changeMemberStatus(@PathVariable Long memberId){
+
+        memberService.changeMemberStatus(memberId);
+
+        return ResponseEntity.ok().build();
     }
 
     /**

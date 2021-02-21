@@ -12,9 +12,6 @@ import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store,Long> {
 
-    @Query("select s from Store s join fetch s.item where s.fileStoreName =:storeName")
-    Optional<Store> findWithItemByFileStoreName(@Param("storeName") String storeName);
-
     List<Store> findByItem(Item item);
 
     @Query("select s from Store s join fetch s.item where s.id =:storeId")

@@ -2,6 +2,8 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
+import inu.project.shareu.model.response.common.SuccessResponse;
+import inu.project.shareu.model.response.point.PointStatusResponse;
 import inu.project.shareu.service.PointService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -9,7 +11,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "포인트")
+@Api(tags = "6.포인트")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -57,7 +58,9 @@ public class PointController {
 
         Member loginMember = getLoginMember();
 
-        return ResponseEntity.ok(pointService.findMyPointStatus(loginMember));
+        PointStatusResponse myPointStatus = pointService.findMyPointStatus(loginMember);
+
+        return ResponseEntity.ok(new SuccessResponse<>(myPointStatus));
     }
 
 

@@ -3,16 +3,17 @@ package inu.project.shareu.service;
 import inu.project.shareu.advice.exception.ItemException;
 import inu.project.shareu.advice.exception.ReportException;
 import inu.project.shareu.advice.exception.ReviewException;
-import inu.project.shareu.domain.Item;
-import inu.project.shareu.domain.Member;
-import inu.project.shareu.domain.Report;
-import inu.project.shareu.domain.Review;
+import inu.project.shareu.domain.*;
 import inu.project.shareu.model.request.report.ReportItemSaveRequest;
 import inu.project.shareu.model.request.report.ReportReviewSaveRequest;
+import inu.project.shareu.model.response.report.ReportResponse;
 import inu.project.shareu.repository.ItemRepository;
 import inu.project.shareu.repository.ReportRepository;
 import inu.project.shareu.repository.ReviewRepository;
+import inu.project.shareu.repository.query.ReportQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReportService {
 
+    private final ReportQueryRepository reportQueryRepository;
     private final ReportRepository reportRepository;
     private final ItemRepository itemRepository;
     private final ReviewRepository reviewRepository;
@@ -65,11 +67,17 @@ public class ReportService {
      * 2. 신고 처리 완료
      */
     @Transactional
-    public void finishReport(Long reportId) {
+    public void deleteReport(Long reportId) {
 
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ReportException("존재하지 않는 신고입니다."));
 
         report.changeReportStatus();
+    }
+
+    public Page<ReportResponse> findPage(Pageable pageable) {
+        Page<Report> reports = reportQueryRepository
+                .findPageWithMemberAndItemAndLectureAndReview(pageable);
+        return reports.map(report -> new ReportResponse(report));
     }
 }
