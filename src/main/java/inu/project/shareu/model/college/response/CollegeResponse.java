@@ -1,6 +1,7 @@
 package inu.project.shareu.model.college.response;
 
 import inu.project.shareu.domain.College;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data

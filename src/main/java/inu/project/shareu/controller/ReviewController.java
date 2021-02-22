@@ -2,15 +2,13 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
+import inu.project.shareu.model.common.response.ExceptionResponse;
 import inu.project.shareu.model.review.request.ReviewSaveRequest;
 import inu.project.shareu.model.review.request.ReviewUpdateRequest;
 import inu.project.shareu.model.review.response.ReviewResponse;
 import inu.project.shareu.service.BadWordService;
 import inu.project.shareu.service.ReviewService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,8 +32,14 @@ public class ReviewController {
 
     @ApiOperation(value = "리뷰 등록",notes = "리뷰 등록")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @PostMapping("/reviews")
     public ResponseEntity<Void> saveReview(@ModelAttribute ReviewSaveRequest reviewSaveRequest) {
@@ -51,12 +55,20 @@ public class ReviewController {
 
     @ApiOperation(value = "리뷰 수정",notes = "리뷰 수정")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "reviewId",value = "리뷰 Id",required = true,
+                    dataType = "long",paramType = "path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @PatchMapping("/reviews/{reviewId}")
     public ResponseEntity<Void> updateReview(@PathVariable Long reviewId,
-                                       @ModelAttribute ReviewUpdateRequest reviewUpdateRequest) {
+                                             @ModelAttribute ReviewUpdateRequest reviewUpdateRequest) {
 
         Member member = getLoginMember();
 
@@ -69,8 +81,16 @@ public class ReviewController {
 
     @ApiOperation(value = "리뷰 삭제",notes = "리뷰 삭제")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "reviewId",value = "리뷰 Id",required = true,
+                    dataType = "long",paramType = "path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId){
@@ -84,8 +104,16 @@ public class ReviewController {
 
     @ApiOperation(value = "관리자 리뷰 삭제",notes = "관리자 리뷰 삭제")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "reviewId",value = "리뷰 Id",required = true,
+                    dataType = "long",paramType = "path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @DeleteMapping("/admin/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReviewByAdmin(@PathVariable Long reviewId){
@@ -97,12 +125,20 @@ public class ReviewController {
 
     @ApiOperation(value = "족보의 리뷰 페이징 조회",notes = "족보의 리뷰 페이징 조회")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header"),
-            @ApiImplicitParam(name = "page",value = "페이지",required = true
-                    ,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "size",value = "페이징 사이즈",required = true
-                    ,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "itemId",value = "족보 Id",required = true,
+                    dataType = "long", paramType = "path"),
+            @ApiImplicitParam(name = "page",value = "페이지",required = true,
+                    dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "size",value = "페이징 사이즈",required = true,
+                    dataType = "int", paramType = "query")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @GetMapping("/items/{itemId}/reviews")
     public ResponseEntity<Page<ReviewResponse>> findReviewPage(

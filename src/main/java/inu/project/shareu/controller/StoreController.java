@@ -4,12 +4,10 @@ import inu.project.shareu.advice.exception.StoreException;
 import inu.project.shareu.config.security.LoginMember;
 import inu.project.shareu.domain.Member;
 import inu.project.shareu.domain.Store;
+import inu.project.shareu.model.common.response.ExceptionResponse;
 import inu.project.shareu.model.store.StoreDto;
 import inu.project.shareu.service.StoreService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,7 +22,7 @@ import java.net.URLEncoder;
 
 @Api(tags = "8.파일")
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class StoreController {
 
@@ -32,11 +30,18 @@ public class StoreController {
 
     @ApiOperation(value = "파일 삭제",notes = "파일 삭제")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "storeId",value = "파일 Id",required = true,
+                    dataType = "long", paramType = "path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @DeleteMapping("/store/{storeId}")
-    @ResponseBody
     public ResponseEntity<Void> removeStore(@PathVariable Long storeId){
 
         Member member = getLoginMember();
@@ -47,8 +52,16 @@ public class StoreController {
 
     @ApiOperation(value = "파일 다운",notes = "파일 다운")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "storeId",value = "파일 Id",required = true,
+                    dataType = "long",paramType = "path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @GetMapping("/store/{storeId}")
     public ResponseEntity<ByteArrayResource> getResourcePath(@PathVariable Long storeId){
@@ -74,8 +87,16 @@ public class StoreController {
 
     @ApiOperation(value = "(관리자) 파일 다운",notes = "(관리자) 파일 다운")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "storeId",value = "파일 Id",required = true,
+                    dataType = "long",paramType = "path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @GetMapping("/admin/store/{storeId}")
     public ResponseEntity<ByteArrayResource> getResourcePathByAdmin(@PathVariable Long storeId){

@@ -2,11 +2,9 @@ package inu.project.shareu.controller;
 
 import inu.project.shareu.model.college.response.CollegeResponse;
 import inu.project.shareu.model.college.response.CollegeWithMajorResponse;
+import inu.project.shareu.model.common.response.ExceptionResponse;
 import inu.project.shareu.service.CollegeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +21,14 @@ public class CollegeController {
 
     @ApiOperation(value = "단과대학 조회",notes = "단과대학 조회")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @GetMapping("/colleges")
     public ResponseEntity<List<CollegeResponse>> findColleges(){
@@ -36,8 +40,14 @@ public class CollegeController {
 
     @ApiOperation(value = "단과대학 및 소속 학과 조회",notes = "단과대학 및 소속 학과 조회")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true
-                    ,dataType = "String", paramType = "header")
+            @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
+                    dataType = "String", paramType = "header")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
+            @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
+            @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
     @GetMapping("/colleges/majors")
     public ResponseEntity<List<CollegeWithMajorResponse>> findCollegesWithMajors(){

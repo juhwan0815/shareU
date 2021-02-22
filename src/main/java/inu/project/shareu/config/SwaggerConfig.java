@@ -16,7 +16,8 @@ public class SwaggerConfig {
 
     @Bean
     public Docket swaggerApi(){
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(swaggerInfo()).select()
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(swaggerInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("inu.project.shareu.controller"))
                 .paths(PathSelectors.any())
                 .build()

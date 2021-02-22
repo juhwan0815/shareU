@@ -3,6 +3,7 @@ package inu.project.shareu.model.item.request;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 

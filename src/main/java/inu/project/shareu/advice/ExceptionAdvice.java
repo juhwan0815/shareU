@@ -43,4 +43,12 @@ public class ExceptionAdvice {
         ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
         return exceptionResponse;
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse exceptionResponse(Exception e){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
+        return exceptionResponse;
+    }
+
 }
