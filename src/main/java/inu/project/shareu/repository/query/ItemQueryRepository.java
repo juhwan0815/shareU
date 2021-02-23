@@ -20,6 +20,7 @@ import static inu.project.shareu.domain.QCollege.*;
 import static inu.project.shareu.domain.QItem.*;
 import static inu.project.shareu.domain.QLecture.*;
 import static inu.project.shareu.domain.QMajor.*;
+import static inu.project.shareu.domain.QReview.*;
 import static inu.project.shareu.domain.QStore.*;
 
 @Repository
@@ -43,7 +44,7 @@ public class ItemQueryRepository {
                 .where(item.member.eq(member))
                 .fetchCount();
 
-        return new PageImpl<>(content,pageable,total);
+        return new PageImpl<>(content, pageable, total);
     }
 
     public Item findWithMajorAndLectureAndStoreAndCollegeById(Long itemId) {
@@ -56,13 +57,12 @@ public class ItemQueryRepository {
                 .where(item.id.eq(itemId))
                 .fetch();
 
-        if (items.isEmpty()){
+        if (items.isEmpty()) {
             throw new ItemException("존재하지 않는 족보입니다");
         }
 
         return items.get(0);
     }
-
 
     public Page<Item> findWithLectureByItemSearchCondition(ItemSearchCondition condition,
                                                            Pageable pageable) {
@@ -89,7 +89,7 @@ public class ItemQueryRepository {
         return new PageImpl<>(content, pageable, total);
     }
 
-    private BooleanExpression itemStatus(ItemStatus itemStatus){
+    private BooleanExpression itemStatus(ItemStatus itemStatus) {
         return item.itemstatus.eq(itemStatus);
     }
 
@@ -110,25 +110,23 @@ public class ItemQueryRepository {
     }
 
     private BooleanExpression collegeStatusEq(String collegeStatus) {
-        if(StringUtils.hasText(collegeStatus)){
-            if(collegeStatus.equals("전공")){
+        if (StringUtils.hasText(collegeStatus)) {
+            if (collegeStatus.equals("전공")) {
                 return college.status.eq(CollegeStatus.전공);
-            }else if(collegeStatus.equals("교양")){
+            } else if (collegeStatus.equals("교양")) {
                 return college.status.eq(CollegeStatus.교양);
-            }
-            else return null;
+            } else return null;
         }
         return null;
     }
 
     private OrderSpecifier orderByEq(String orderBy) {
-        if(StringUtils.hasText(orderBy)){
-            if(orderBy.equals("추천순")){
+        if (StringUtils.hasText(orderBy)) {
+            if (orderBy.equals("추천순")) {
                 return item.recommend.desc();
-            }else if(orderBy.equals("최신순")){
+            } else if (orderBy.equals("최신순")) {
                 return item.id.desc();
-            }
-            else return item.recommend.desc();
+            } else return item.recommend.desc();
         }
         return item.recommend.desc();
     }

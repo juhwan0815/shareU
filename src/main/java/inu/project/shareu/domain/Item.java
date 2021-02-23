@@ -42,6 +42,9 @@ public class Item extends BaseEntity{
     private Lecture lecture;
 
     @OneToMany(mappedBy = "item")
+    public List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item")
     private List<Store> storeList = new ArrayList<>();
 
     public static Item createItem(String title,String itemContents,Lecture lecture,

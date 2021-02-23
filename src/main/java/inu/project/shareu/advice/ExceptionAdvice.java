@@ -3,13 +3,28 @@ package inu.project.shareu.advice;
 import inu.project.shareu.advice.exception.*;
 import inu.project.shareu.model.common.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
 public class ExceptionAdvice {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String,String>> handlerValidationExceptions(MethodArgumentNotValidException e){
+        Map<String,String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors()
+                .forEach(error -> errors.put(((FieldError) error).getField(),error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors);
+    }
 
     @ExceptionHandler({
             MemberException.class,
@@ -22,7 +37,7 @@ public class ExceptionAdvice {
             LectureException.class,
             BadWordException.class,
             ReportException.class,
-            StoreException.class
+            StoreException.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse expectException(Exception e){
@@ -50,5 +65,6 @@ public class ExceptionAdvice {
         ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
         return exceptionResponse;
     }
+
 
 }

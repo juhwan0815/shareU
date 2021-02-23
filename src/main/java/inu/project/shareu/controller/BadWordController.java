@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @Api(tags = "(관리자 전용) 금칙어")
 @Slf4j
 @RestController
@@ -37,7 +39,7 @@ public class BadWordController {
     })
 
     @PostMapping("/badwords")
-    public ResponseEntity<Void> saveBadWord(@ModelAttribute BadWordSaveRequest badWordSaveRequest){
+    public ResponseEntity<Void> saveBadWord(@Valid @RequestBody BadWordSaveRequest badWordSaveRequest){
 
         badWordService.saveBadWord(badWordSaveRequest);
 

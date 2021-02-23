@@ -3,6 +3,7 @@ package inu.project.shareu.model.item.response;
 import inu.project.shareu.domain.Item;
 import inu.project.shareu.domain.ItemStatus;
 import inu.project.shareu.domain.Lecture;
+import inu.project.shareu.domain.RecommendStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -21,6 +22,8 @@ public class ItemSearchResponse {
     private String professor;
 
     private String itemStatus;
+
+    private int reviewCount;
 
     private LocalDate localDate;
 
