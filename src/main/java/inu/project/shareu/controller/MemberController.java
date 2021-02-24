@@ -25,6 +25,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @Api(tags = {"1.회원"})
 @Slf4j
 @RestController
@@ -40,8 +42,10 @@ public class MemberController {
             @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/members")
-    public ResponseEntity<Void> saveMember(@ModelAttribute MemberSaveRequest memberSaveRequest) {
+    @PostMapping(value = "/members",produces = "application/json")
+    public ResponseEntity<Void> saveMember(
+            @ApiParam(name = "회원가입 요청 모델",value = "회원가입 요청 모델",required = true,type = "body")
+            @RequestBody @Valid MemberSaveRequest memberSaveRequest) {
 
         badWordService.validateItemForbiddenWord(memberSaveRequest.getName());
         memberService.saveMember(memberSaveRequest);
@@ -54,8 +58,10 @@ public class MemberController {
             @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/members/login")
-    public ResponseEntity<MemberAuthResponse> loginMember(@ModelAttribute MemberLoginRequest memberLoginRequest) {
+    @PostMapping(value = "/members/login",produces = "application/json")
+    public ResponseEntity<MemberAuthResponse> loginMember(
+            @ApiParam(name = "회원 로그인 요청 모델",value = "회원 로그인 요청 모델",required = true,type = "body")
+            @RequestBody @Valid MemberLoginRequest memberLoginRequest) {
 
         Member loginMember = memberService.loginMember(memberLoginRequest);
 
@@ -63,7 +69,6 @@ public class MemberController {
 
         return ResponseEntity.ok(new MemberAuthResponse(token));
     }
-
 
     @ApiOperation(value = "회원 수정",notes = "회원 수정")
     @ApiImplicitParams({
@@ -76,8 +81,10 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping("/members")
-    public ResponseEntity<Void> updateMember(@ModelAttribute MemberUpdateRequest memberUpdateRequest){
+    @PatchMapping(value = "/members",produces = "application/json")
+    public ResponseEntity<Void> updateMember(
+            @ApiParam(name = "회원 수정 요청 모델",value = "회원 수정 요청 모델",required = true,type = "body")
+            @RequestBody @Valid MemberUpdateRequest memberUpdateRequest){
 
         Member loginMember = getLoginMember();
 
@@ -98,7 +105,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/members")
+    @DeleteMapping(value = "/members",produces = "application/json")
     public ResponseEntity<Void> removeMember(){
 
         Member loginMember = getLoginMember();
@@ -120,7 +127,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/members")
+    @GetMapping(value = "/members",produces = "application/json")
     public ResponseEntity<MemberResponse> findLoginMember(){
 
         Member loginMember = getLoginMember();
@@ -143,7 +150,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/admin/members")
+    @GetMapping(value = "/admin/members",produces = "application/json")
     public ResponseEntity<Page<MemberBlockResponse>> findBlockMember(
             @PageableDefault(size = 15,sort = "id",direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -163,7 +170,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping("/admin/members/{memberId}")
+    @PatchMapping(value = "/admin/members/{memberId}",produces = "application/json")
     public ResponseEntity<Void> changeMemberStatus(@PathVariable Long memberId){
 
         memberService.changeMemberStatus(memberId);

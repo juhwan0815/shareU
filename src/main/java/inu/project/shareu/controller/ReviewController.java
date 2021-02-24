@@ -21,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @Api(tags = "3.리뷰")
 @Slf4j
 @RestController
@@ -41,8 +43,10 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/reviews")
-    public ResponseEntity<Void> saveReview(@ModelAttribute ReviewSaveRequest reviewSaveRequest) {
+    @PostMapping(value = "/reviews",produces = "application/json")
+    public ResponseEntity<Void> saveReview(
+            @ApiParam(name = "리뷰 등록 요청 모델",value = "리뷰 등록 요청 모델",required = true,type = "body")
+            @RequestBody @Valid ReviewSaveRequest reviewSaveRequest) {
 
         Member member = getLoginMember();
 
@@ -66,9 +70,11 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping("/reviews/{reviewId}")
-    public ResponseEntity<Void> updateReview(@PathVariable Long reviewId,
-                                             @ModelAttribute ReviewUpdateRequest reviewUpdateRequest) {
+    @PatchMapping(value = "/reviews/{reviewId}",produces = "application/json")
+    public ResponseEntity<Void> updateReview(
+            @PathVariable Long reviewId,
+            @ApiParam(name = "리뷰 수정 요청 모델",value = "리뷰 수정 요청 모델",required = true,type = "body")
+            @RequestBody @Valid ReviewUpdateRequest reviewUpdateRequest) {
 
         Member member = getLoginMember();
 
@@ -92,7 +98,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/reviews/{reviewId}")
+    @DeleteMapping(value = "/reviews/{reviewId}",produces = "application/json")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId){
 
         Member member = getLoginMember();
@@ -115,7 +121,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/admin/reviews/{reviewId}")
+    @DeleteMapping(value = "/admin/reviews/{reviewId}",produces = "application/json")
     public ResponseEntity<Void> deleteReviewByAdmin(@PathVariable Long reviewId){
 
         reviewService.deleteReviewByAdmin(reviewId);
@@ -140,7 +146,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/items/{itemId}/reviews")
+    @GetMapping(value = "/items/{itemId}/reviews",produces = "application/json")
     public ResponseEntity<Page<ReviewResponse>> findReviewPage(
             @PathVariable Long itemId,
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)

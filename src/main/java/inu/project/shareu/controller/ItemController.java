@@ -20,11 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.Valid;
 
 @Api(tags = "2.족보")
 @Slf4j
@@ -36,28 +39,20 @@ public class ItemController {
     private final StoreService storeService;
     private final BadWordService badWordService;
 
-    @ApiOperation(value = "족보 등록",notes = "족보 등록")
+    @ApiOperation(value = "족보 등록",notes = "족보 등록 \n 스웨거 다중 파일 업로드르 지원하지 않아 포스트맨으로 테스트")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
-                    dataType = "String", paramType = "header"),
-            @ApiImplicitParam(name = "lectureId",value = "강의 Id",required = true,
-                    dataType = "long", paramType = "query"),
-            @ApiImplicitParam(name = "title",value = "족보 제목",required = true,
-                    dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "itemContents",value = "족보 설명",required = true,
-                    dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "files",value = "족보 파일 (다중 선택 가능)",required = true,
-                    dataType = "file",paramType = "query")
+                    dataType = "String", paramType = "header")
     })
     @ApiResponses({
+            @ApiResponse(code = 200,message = "OK"),
             @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
             @ApiResponse(code = 401, message = "UNAUTHORIZED", response = ExceptionResponse.class),
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/items")
-    public ResponseEntity<Void> saveItem(
-            @ApiIgnore @ModelAttribute ItemSaveRequest itemSaveRequest){
+    @PostMapping(value = "/items",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> saveItem(@Valid ItemSaveRequest itemSaveRequest){
 
         // TODO 파일 타입 체크
 
@@ -87,11 +82,12 @@ public class ItemController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping("/items/{itemId}")
-    public ResponseEntity<Void> updateItem(@PathVariable Long itemId,
-                                           @ModelAttribute ItemUpdateRequest itemUpdateRequest){
+    @PatchMapping(value = "/items/{itemId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateItem(
+            @PathVariable Long itemId,
+            @ApiParam(name = "족보 수정 요청 모델",value = "족보 수정 요청 모델",required = true,type = "body")
+            @RequestBody @Valid ItemUpdateRequest itemUpdateRequest){
 
-        // TODO 파일 수정은 어떻게?
         Member member = getLoginMember();
 
         badWordService.validateItemForbiddenWord(itemUpdateRequest.getTitle(),
@@ -113,7 +109,7 @@ public class ItemController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/items/{itemId}")
+    @DeleteMapping(value = "/items/{itemId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteItem(@PathVariable Long itemId){
 
         Member member = getLoginMember();
@@ -137,7 +133,7 @@ public class ItemController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/admin/items/{itemId}")
+    @DeleteMapping(value = "/admin/items/{itemId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteItemByAdmin(@PathVariable Long itemId){
 
         Item item = itemService.deleteItemByAdmin(itemId);
@@ -161,7 +157,7 @@ public class ItemController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/members/items")
+    @GetMapping(value = "/members/items",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ItemResponse>> findMyItems(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -183,7 +179,7 @@ public class ItemController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/items/{itemId}")
+    @GetMapping(value = "/items/{itemId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ItemDetailResponse> findItemById(@PathVariable Long itemId){
 
         ItemDetailResponse itemDetail = itemService.findItemById(itemId);
@@ -206,7 +202,7 @@ public class ItemController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/items")
+    @GetMapping(value = "/items",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ItemSearchResponse>> findItemPage(
             ItemSearchCondition itemSearchCondition,
             Pageable pageable){

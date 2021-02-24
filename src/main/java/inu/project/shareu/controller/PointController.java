@@ -43,7 +43,7 @@ public class PointController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/points")
+    @GetMapping(value = "/points",produces = "application/json")
     public ResponseEntity<Page<PointResponse>> findMyPoints(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -64,7 +64,7 @@ public class PointController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/points/status")
+    @GetMapping(value = "/points/status",produces = "application/json")
     public ResponseEntity<PointStatusResponse> findMyPointStatus(){
 
         Member loginMember = getLoginMember();

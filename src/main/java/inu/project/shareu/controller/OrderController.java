@@ -42,7 +42,7 @@ public class OrderController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/orders")
+    @PostMapping(value = "/orders",produces = "application/json")
     public ResponseEntity<Void> saveBulkOrder(){
 
         Member member = getLoginMember();
@@ -65,7 +65,7 @@ public class OrderController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/orders/items/{itemId}")
+    @PostMapping(value = "/orders/items/{itemId}",produces = "application/json")
     public ResponseEntity<Void> saveSingleOrder(@PathVariable Long itemId){
 
         Member member = getLoginMember();
@@ -98,8 +98,6 @@ public class OrderController {
         Member loginMember = getLoginMember();
         return ResponseEntity.ok(cartQueryService.findOrderItemPage(loginMember,pageable));
     }
-
-
 
     /**
      * 현재 로그인한 사용자를 가져온다.

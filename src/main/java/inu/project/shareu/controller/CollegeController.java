@@ -30,7 +30,7 @@ public class CollegeController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/colleges")
+    @GetMapping(value = "/colleges",produces = "application/json")
     public ResponseEntity<List<CollegeResponse>> findColleges(){
 
         List<CollegeResponse> result = collegeService.findAll();
@@ -49,7 +49,7 @@ public class CollegeController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/colleges/majors")
+    @GetMapping(value = "/colleges/majors",produces = "application/json")
     public ResponseEntity<List<CollegeWithMajorResponse>> findCollegesWithMajors(){
 
         List<CollegeWithMajorResponse> result = collegeService.findAllWithMajors();

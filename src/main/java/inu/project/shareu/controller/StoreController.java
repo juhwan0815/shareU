@@ -11,6 +11,7 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +42,7 @@ public class StoreController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/store/{storeId}")
+    @DeleteMapping(value = "/store/{storeId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> removeStore(@PathVariable Long storeId){
 
         Member member = getLoginMember();
@@ -63,7 +64,7 @@ public class StoreController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/store/{storeId}")
+    @GetMapping(value = "/store/{storeId}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<ByteArrayResource> getResourcePath(@PathVariable Long storeId){
 
         Member member = getLoginMember();
@@ -98,7 +99,7 @@ public class StoreController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/admin/store/{storeId}")
+    @GetMapping(value = "/admin/store/{storeId}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<ByteArrayResource> getResourcePathByAdmin(@PathVariable Long storeId){
 
         StoreDto storeDto = storeService.downloadFileByAdmin(storeId);

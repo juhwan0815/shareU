@@ -18,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Api(tags = "강의")
@@ -39,8 +42,10 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/admin/lectures")
-    public ResponseEntity<Void> saveLecture(@ModelAttribute LectureSaveRequest lectureSaveRequest){
+    @PostMapping(value = "/admin/lectures",produces = "application/json")
+    public ResponseEntity<Void> saveLecture(
+            @ApiParam(name = "강의 등록 요청 모델",value = "강의 등록 요청 모델",required = true,type = "body")
+            @RequestBody @Valid LectureSaveRequest lectureSaveRequest){
 
         lectureService.saveLecture(lectureSaveRequest);
 
@@ -60,9 +65,11 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping("/admin/lectures/{lectureId}")
-    public ResponseEntity<Void> updateLecture(@PathVariable Long lectureId,
-                                              @ModelAttribute LectureUpdateRequest lectureUpdateRequest){
+    @PutMapping(value = "/admin/lectures/{lectureId}",produces = "application/json")
+    public ResponseEntity<Void> updateLecture(
+            @PathVariable Long lectureId,
+            @ApiParam(name = "강의 수정 요청 모델",value = "강의 수정 요청 모델",required = true,type = "body")
+            @RequestBody @Valid LectureUpdateRequest lectureUpdateRequest){
 
         lectureService.updateLecture(lectureId,lectureUpdateRequest);
 
@@ -82,7 +89,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/admin/lectures/{lectureId}")
+    @DeleteMapping(value = "/admin/lectures/{lectureId}",produces = "application/json")
     public ResponseEntity<Void> deleteLecture(@PathVariable Long lectureId){
 
         lectureService.deleteLecture(lectureId);
@@ -105,7 +112,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/admin/lectures")
+    @GetMapping(value = "/admin/lectures",produces = "application/json")
     public ResponseEntity<Page<LectureResponse>> findLectures(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -125,9 +132,10 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/lectures/name")
+    @GetMapping(value = "/lectures/name",produces = "application/json")
     public ResponseEntity<List<LectureNameResponse>> findLectureName(
-            @ApiIgnore @RequestParam("majorId") Long majorId){
+            @ApiIgnore @NotNull(message = "전공 Id는 필수값입니다.")
+            @RequestParam("majorId") Long majorId){
 
         List<LectureNameResponse> result = lectureService.findLectureNameByMajorId(majorId);
 
@@ -147,9 +155,10 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/lecture/professor")
+    @GetMapping(value = "/lecture/professor",produces = "application/json")
     public ResponseEntity<List<LectureProfessorResponse>> findLectureProfessor(
-            @ApiIgnore @RequestParam("lectureName") String lectureName){
+            @ApiIgnore @NotBlank(message = "강의명은 필수값입니다.")
+            @RequestParam("lectureName") String lectureName){
 
         List<LectureProfessorResponse> result = lectureService.findLectureProfessorByLectureName(lectureName);
 

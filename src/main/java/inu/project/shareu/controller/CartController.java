@@ -41,8 +41,10 @@ public class CartController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/carts")
-    public ResponseEntity<Void> saveCart(@ModelAttribute CartSaveRequest cartSaveRequest){
+    @PostMapping(value = "/carts",produces = "application/json")
+    public ResponseEntity<Void> saveCart(
+            @ApiParam(name = "장바구니 등록 요청 모델",value = "금칙어 등록 요청 모델",required = true,type = "body")
+            @RequestBody CartSaveRequest cartSaveRequest){
 
         Member member = getLoginMember();
 
@@ -65,7 +67,7 @@ public class CartController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/carts/{cartId}")
+    @DeleteMapping(value = "/carts/{cartId}",produces = "application/json")
     public ResponseEntity<Void> deleteCart(@PathVariable Long cartId){
 
         Member member = getLoginMember();
@@ -90,7 +92,7 @@ public class CartController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/carts")
+    @GetMapping(value = "/carts",produces = "application/json")
     public ResponseEntity<Page<CartResponse>> findCarts(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){

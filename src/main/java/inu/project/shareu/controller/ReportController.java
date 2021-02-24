@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @Api(tags = "7.신고")
 @Slf4j
 @RestController
@@ -41,9 +43,11 @@ public class ReportController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/reports/item/{itemId}")
-    public ResponseEntity<Void> saveReportItem(@PathVariable Long itemId,
-                                               @ModelAttribute ReportItemSaveRequest reportItemSaveRequest){
+    @PostMapping(value = "/reports/item/{itemId}",produces = "application/json")
+    public ResponseEntity<Void> saveReportItem(
+            @PathVariable Long itemId,
+            @ApiParam(name = "족보 신고 등록 요청 모델",value = "족보 신고 등록 요청 모델",required = true,type = "body")
+            @RequestBody @Valid ReportItemSaveRequest reportItemSaveRequest){
 
         Member member = getLoginMember();
 
@@ -65,9 +69,11 @@ public class ReportController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping("/reports/review/{reviewId}")
-    public ResponseEntity<Void> saveReportReview(@PathVariable Long reviewId,
-                                                 @ModelAttribute ReportReviewSaveRequest reportReviewSaveRequest){
+    @PostMapping(value = "/reports/review/{reviewId}",produces = "application/json")
+    public ResponseEntity<Void> saveReportReview(
+            @PathVariable Long reviewId,
+            @ApiParam(name = "리뷰 신고 등록 요청 모델",value = "리뷰 신고 등록 요청 모델",required = true,type = "body")
+            @RequestBody @Valid ReportReviewSaveRequest reportReviewSaveRequest){
 
         Member member = getLoginMember();
 
@@ -80,7 +86,7 @@ public class ReportController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
                     dataType = "String", paramType = "header"),
-            @ApiImplicitParam(name = "reporyId",value = "신고 Id",required = true,
+            @ApiImplicitParam(name = "reportId",value = "신고 Id",required = true,
                     dataType = "long",paramType = "path")
     })
     @ApiResponses({
@@ -89,7 +95,7 @@ public class ReportController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping("/admin/reports/{reportId}")
+    @DeleteMapping(value = "/admin/reports/{reportId}",produces = "application/json")
     public ResponseEntity<Void> deleteReport(@PathVariable Long reportId){
 
         reportService.deleteReport(reportId);
@@ -97,7 +103,7 @@ public class ReportController {
         return ResponseEntity.ok().build();
     }
 
-    @ApiOperation(value = "(관리자) 리뷰 페이징 조회 ",notes = "(관리자) 리뷰 페이징 조회")
+    @ApiOperation(value = "(관리자) 신고 페이징 조회 ",notes = "(관리자) 신고 페이징 조회")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization",value = "로그인 성공 후 access_token",required = true,
                     dataType = "String", paramType = "header"),
@@ -112,9 +118,9 @@ public class ReportController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/admin/reports")
+    @GetMapping(value = "/admin/reports",produces = "application/json")
     public ResponseEntity<Page<ReportResponse>> findPage(
-            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
+            @PageableDefault(size = 15,sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
 
         return ResponseEntity.ok(reportService.findPage(pageable));
