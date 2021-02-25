@@ -33,6 +33,7 @@ public class ItemResponse {
     private LocalDate createdDate;
 
     public ItemResponse(Item item, Lecture lecture) {
+        this.itemId = item.getId();
         this.lectureName = lecture.getLectureName();
         this.title = item.getTitle();
         this.professor = lecture.getProfessor();

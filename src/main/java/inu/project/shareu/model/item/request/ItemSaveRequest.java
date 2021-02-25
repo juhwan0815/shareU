@@ -29,7 +29,6 @@ public class ItemSaveRequest {
     private String itemContents;
 
     @ApiModelProperty(name = "files",value = "족보 파일 (포스트맨으로 테스트)",required = true)
-    @NotNull(message = "파일은 필수값입니다.")
     private List<MultipartFile> files;
 
 

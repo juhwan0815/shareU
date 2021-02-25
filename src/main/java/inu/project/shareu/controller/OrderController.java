@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +43,7 @@ public class OrderController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/orders",produces = "application/json")
+    @PostMapping(value = "/orders",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveBulkOrder(){
 
         Member member = getLoginMember();
@@ -65,7 +66,7 @@ public class OrderController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/orders/items/{itemId}",produces = "application/json")
+    @PostMapping(value = "/orders/items/{itemId}",produces =MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveSingleOrder(@PathVariable Long itemId){
 
         Member member = getLoginMember();
@@ -90,7 +91,7 @@ public class OrderController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping("/orders/items")
+    @GetMapping(value = "/orders/items",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ItemOrderResponse>> findOrderItems(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,7 +44,7 @@ public class PointController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/points",produces = "application/json")
+    @GetMapping(value = "/points",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<PointResponse>> findMyPoints(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -64,10 +65,11 @@ public class PointController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/points/status",produces = "application/json")
+    @GetMapping(value = "/points/status",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PointStatusResponse> findMyPointStatus(){
 
         Member loginMember = getLoginMember();
+
 
         PointStatusResponse myPointStatus = pointService.findMyPointStatus(loginMember);
 

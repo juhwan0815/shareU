@@ -6,6 +6,7 @@ import inu.project.shareu.model.common.response.ExceptionResponse;
 import inu.project.shareu.service.CollegeService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ public class CollegeController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/colleges",produces = "application/json")
+    @GetMapping(value = "/colleges",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CollegeResponse>> findColleges(){
 
         List<CollegeResponse> result = collegeService.findAll();
@@ -49,7 +50,7 @@ public class CollegeController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/colleges/majors",produces = "application/json")
+    @GetMapping(value = "/colleges/majors",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CollegeWithMajorResponse>> findCollegesWithMajors(){
 
         List<CollegeWithMajorResponse> result = collegeService.findAllWithMajors();

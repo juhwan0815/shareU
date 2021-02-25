@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -42,7 +43,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/admin/lectures",produces = "application/json")
+    @PostMapping(value = "/admin/lectures",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveLecture(
             @ApiParam(name = "강의 등록 요청 모델",value = "강의 등록 요청 모델",required = true,type = "body")
             @RequestBody @Valid LectureSaveRequest lectureSaveRequest){
@@ -65,7 +66,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PutMapping(value = "/admin/lectures/{lectureId}",produces = "application/json")
+    @PutMapping(value = "/admin/lectures/{lectureId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateLecture(
             @PathVariable Long lectureId,
             @ApiParam(name = "강의 수정 요청 모델",value = "강의 수정 요청 모델",required = true,type = "body")
@@ -89,7 +90,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping(value = "/admin/lectures/{lectureId}",produces = "application/json")
+    @DeleteMapping(value = "/admin/lectures/{lectureId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteLecture(@PathVariable Long lectureId){
 
         lectureService.deleteLecture(lectureId);
@@ -112,7 +113,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/admin/lectures",produces = "application/json")
+    @GetMapping(value = "/admin/lectures",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<LectureResponse>> findLectures(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -132,7 +133,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/lectures/name",produces = "application/json")
+    @GetMapping(value = "/lectures/name",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LectureNameResponse>> findLectureName(
             @ApiIgnore @NotNull(message = "전공 Id는 필수값입니다.")
             @RequestParam("majorId") Long majorId){
@@ -155,7 +156,7 @@ public class LectureController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/lecture/professor",produces = "application/json")
+    @GetMapping(value = "/lecture/professor",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LectureProfessorResponse>> findLectureProfessor(
             @ApiIgnore @NotBlank(message = "강의명은 필수값입니다.")
             @RequestParam("lectureName") String lectureName){

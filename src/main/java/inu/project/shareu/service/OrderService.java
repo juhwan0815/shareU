@@ -6,7 +6,9 @@ import inu.project.shareu.advice.exception.MemberException;
 import inu.project.shareu.advice.exception.OrderException;
 import inu.project.shareu.domain.*;
 import inu.project.shareu.repository.*;
+import inu.project.shareu.repository.query.CartQueryRepository;
 import inu.project.shareu.repository.query.MemberQueryRepository;
+import inu.project.shareu.service.query.CartQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final PointRepository pointRepository;
     private final CartRepository cartRepository;
+    private final CartQueryRepository cartQueryRepository;
 
     /**
      * 장바구니 족보 모두 구매
@@ -35,13 +38,14 @@ public class OrderService {
      */
     @Transactional
     public void saveBulkOrder(Member loginMember) {
-        // TODO 아이템 판매여부 확인
+
         Member member= memberRepository.findById(loginMember.getId())
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
 
-        List<Cart> carts = cartRepository.findByMemberAndCartStatus(member, CartStatus.CART);
+        List<Cart> carts = cartQueryRepository.findWithItemByMemberAndCartStatus(member, CartStatus.CART);
 
         validateCartsExist(carts);
+        validateCartsItemStatus(carts);
 
         List<Point> pointList = carts.stream()
                 .map(cart -> Point.createPoint("족보 구매", -3,
@@ -138,5 +142,18 @@ public class OrderService {
         if(carts.isEmpty()){
             throw new CartException("장바구니에 담긴 족보가 존재하지 않습니다.");
         }
+    }
+
+
+    /**
+     * 장바구니의 족보들의 상태 확인
+     * 족보가 판매중이지 않으면 throw exception
+     */
+    private void validateCartsItemStatus(List<Cart> carts) {
+        carts.stream().forEach(cart -> {
+            if(!cart.getItem().getItemstatus().equals(ItemStatus.SALE)){
+                throw new ItemException(cart.getItem().getTitle() + "은 구매할수 없습니다.");
+            }
+        });
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -38,7 +39,7 @@ public class MajorController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/admin/majors",produces = "application/json")
+    @PostMapping(value = "/admin/majors",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveMajor(
             @ApiParam(name = "전공 & 교양 등록 요청 모델",value = "전공 & 교양 등록 요청 모델",required = true,type = "body")
             @RequestBody @Valid MajorSaveRequest majorSaveRequest){
@@ -61,7 +62,7 @@ public class MajorController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PutMapping(value = "/admin/majors/{majorId}",produces = "application/json")
+    @PutMapping(value = "/admin/majors/{majorId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateMajor(
             @PathVariable Long majorId,
             @ApiParam(name = "전공 & 교양 수정 요청 모델",value = "전공 & 교양 수정 요청 모델",required = true,type = "body")
@@ -85,7 +86,7 @@ public class MajorController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping(value = "/admin/majors/{majorId}",produces = "application/json")
+    @DeleteMapping(value = "/admin/majors/{majorId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteMajor(@PathVariable Long majorId){
         majorService.deleteMajor(majorId);
 
@@ -107,7 +108,7 @@ public class MajorController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/admin/majors",produces = "application/json")
+    @GetMapping(value = "/admin/majors",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<MajorResponse>> findMajors(
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -127,7 +128,7 @@ public class MajorController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/college/{collegeId}/majors",produces = "application/json")
+    @GetMapping(value = "/college/{collegeId}/majors",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MajorResponse>> findMajorsByCollegeId(
             @ApiIgnore @PathVariable("collegeId") Long collegeId){
 

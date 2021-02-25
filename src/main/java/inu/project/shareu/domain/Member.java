@@ -99,4 +99,8 @@ public class Member extends BaseEntity {
             throw new MemberException("족보는 하루에 5개까지 등록가능합니다.");
         }
     }
+
+    public void removeMember() {
+        this.memberStatus = MemberStatus.DELETE;
+    }
 }

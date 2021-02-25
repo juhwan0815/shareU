@@ -1,10 +1,7 @@
 package inu.project.shareu.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import inu.project.shareu.advice.exception.CartException;
 import inu.project.shareu.advice.exception.StoreException;
@@ -22,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,33 +39,29 @@ public class StoreService {
 
     /**
      * 족보의 파일 저장
-     * 1. MultiPartFile -> File로 변환
-     * 2. UUID를 이용하여 고유한 저장이름 생성
-     * 3. S3에 저장
-     * 4. 변환한 파일 삭제
-     * 5. S3의 파일 접근 경로를 얻어낸다.
-     * 6. 저장내역 생성 및 저장
+     * 1. UUID를 이용하여 고유한 저장이름 생성
+     * 2. S3에 저장
+     * 3. 변환한 파일 삭제
+     * 4. S3의 파일 접근 경로를 얻어낸다.
+     * 5. 저장내역 생성 및 저장
      */
     @Transactional
     public void saveFile(List<MultipartFile> files, Item item)  {
 
         for (MultipartFile file : files) {
 
-            File uploadFile = null;
-
-            try {
-                uploadFile = convert(file)
-                        .orElseThrow(() -> new StoreException("MultipartFile -> File로 전환이 실패했습니다."));
-            } catch (IOException e) {
-                throw new StoreException("파일 변환 실패");
-            }
-
             String storeName = UUID.randomUUID().toString() + file.getOriginalFilename();
 
-            amazonS3Client.putObject(new PutObjectRequest(bucket,storeName,uploadFile)
-                          .withCannedAcl(CannedAccessControlList.PublicRead));
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
 
-            removeNewFile(uploadFile);
+            try {
+                amazonS3Client.putObject(new PutObjectRequest(bucket,storeName,file.getInputStream(),objectMetadata)
+                              .withCannedAcl(CannedAccessControlList.PublicRead));
+            } catch (IOException e) {
+                throw new StoreException("파일 업로드 실패");
+            }
 
             Store store = Store.creatStore(file, storeName,item);
             storeRepository.save(store);
@@ -192,31 +186,6 @@ public class StoreService {
         }
     }
 
-    /**
-     * 변환 파일 삭제
-     */
-    private void removeNewFile(File targetFile) {
-        if (targetFile.delete()) {
-            log.info("파일이 삭제되었습니다.");
-        } else {
-            log.info("파일이 삭제되지 못했습니다.");
-        }
-    }
-
-    /**
-     * MultiPartFile -> File로 변환
-     */
-    private Optional<File> convert(MultipartFile file) throws IOException {
-
-        File convertFile = new File(file.getOriginalFilename());
-        if (convertFile.createNewFile()) {
-            try (FileOutputStream fos = new FileOutputStream(convertFile)) {
-                fos.write(file.getBytes());
-            }
-            return Optional.of(convertFile);
-        }
-        return Optional.empty();
-    }
 
 
 }

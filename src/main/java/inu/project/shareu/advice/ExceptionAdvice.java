@@ -20,20 +20,20 @@ public class ExceptionAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handlerValidationExceptions(MethodArgumentNotValidException e) {
+    public ResponseEntity<ExceptionResponse> handlerValidationExceptions(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors()
                 .forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
-        return ResponseEntity.badRequest().body(errors);
+        return ResponseEntity.badRequest().body(new ExceptionResponse("잘못된 요청입니다.",errors));
     }
 
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handlerValidationExceptions(BindException e) {
+    public ResponseEntity<ExceptionResponse> handlerValidationExceptions(BindException e) {
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors()
                 .forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
-        return ResponseEntity.badRequest().body(errors);
+        return ResponseEntity.badRequest().body(new ExceptionResponse("잘못된 요청입니다.",errors));
     }
 
     @ExceptionHandler({
@@ -69,12 +69,12 @@ public class ExceptionAdvice {
         return exceptionResponse;
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse exceptionResponse(Exception e){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
-        return exceptionResponse;
-    }
-
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ExceptionResponse exceptionResponse(Exception e){
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
+//        return exceptionResponse;
+//    }
+//
 
 }

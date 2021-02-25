@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,7 +44,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/reviews",produces = "application/json")
+    @PostMapping(value = "/reviews",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveReview(
             @ApiParam(name = "리뷰 등록 요청 모델",value = "리뷰 등록 요청 모델",required = true,type = "body")
             @RequestBody @Valid ReviewSaveRequest reviewSaveRequest) {
@@ -70,7 +71,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping(value = "/reviews/{reviewId}",produces = "application/json")
+    @PatchMapping(value = "/reviews/{reviewId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateReview(
             @PathVariable Long reviewId,
             @ApiParam(name = "리뷰 수정 요청 모델",value = "리뷰 수정 요청 모델",required = true,type = "body")
@@ -98,7 +99,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping(value = "/reviews/{reviewId}",produces = "application/json")
+    @DeleteMapping(value = "/reviews/{reviewId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId){
 
         Member member = getLoginMember();
@@ -121,7 +122,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping(value = "/admin/reviews/{reviewId}",produces = "application/json")
+    @DeleteMapping(value = "/admin/reviews/{reviewId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteReviewByAdmin(@PathVariable Long reviewId){
 
         reviewService.deleteReviewByAdmin(reviewId);
@@ -146,7 +147,7 @@ public class ReviewController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/items/{itemId}/reviews",produces = "application/json")
+    @GetMapping(value = "/items/{itemId}/reviews",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ReviewResponse>> findReviewPage(
             @PathVariable Long itemId,
             @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC)

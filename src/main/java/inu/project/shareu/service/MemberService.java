@@ -1,17 +1,17 @@
 package inu.project.shareu.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import inu.project.shareu.advice.exception.MemberException;
-import inu.project.shareu.domain.Member;
-import inu.project.shareu.domain.MemberStatus;
-import inu.project.shareu.domain.Role;
+import inu.project.shareu.domain.*;
 import inu.project.shareu.model.member.request.MemberLoginRequest;
 import inu.project.shareu.model.member.request.MemberSaveRequest;
 import inu.project.shareu.model.member.request.MemberUpdateRequest;
 import inu.project.shareu.model.member.response.MemberBlockResponse;
-import inu.project.shareu.repository.MemberRepository;
+import inu.project.shareu.repository.*;
 import inu.project.shareu.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,9 +28,23 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MemberService {
 
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberQueryRepository memberQueryRepository;
+
+    private final AmazonS3Client amazonS3Client;
+
+
+    private final ItemRepository itemRepository;
+    private final ReviewRepository reviewRepository;
+    private final StoreRepository storeRepository;
+    private final PointRepository pointRepository;
+    private final ReportRepository reportRepository;
+    private final CartRepository cartRepository;
+    private final OrderRepository orderRepository;
 
     /**
      * 매일 0 시에 족보 등록 가능 회수 초기화
@@ -106,7 +120,7 @@ public class MemberService {
             validateMemberPasswordSame(memberUpdateRequest.getCurrentPassword(),
                                        findMember.getPassword());
 
-            findMember.changePassword(memberUpdateRequest.getChangePassword1());
+            findMember.changePassword(passwordEncoder.encode(memberUpdateRequest.getChangePassword1()));
             findMember.changeName(memberUpdateRequest.getName());
 
         }else {
@@ -117,18 +131,52 @@ public class MemberService {
             findMember.changeName(memberUpdateRequest.getName());
 
         }
-
-
     }
 
     /**
      * 회원 탈퇴
-     * 1. 회원 탈퇴
+     * 1. 회원 조회 및 탈퇴로 회원상태 변경
+     * 2. 회원 포인트 이력 조히 및 삭제
+     * 3. 회원 신고 이력 조회 및 삭제
+     * 4. 회원 리뷰 조회 및 리뷰 상태 변경 -> 리뷰 상품 추천 수 변경
+     * 5. 회원 장바구니 조회 및 삭제
+     * 6. 회원 구매 이력 조회 및 삭제
+     * 7. 회원 족보 조회 및 상품 상태 변경 -> 족보의 파일 모두 삭제
      */
     @Transactional
     public void removeMember(Member member) {
-        memberRepository.delete(member);
-        // TODO 회원 탈퇴시, 포인트, 장바구니, 구매내역, 게시글, 리뷰 모두 삭제
+
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
+        findMember.removeMember();
+
+        List<Point> points = pointRepository.findByMember(findMember);
+        points.stream().forEach(point -> pointRepository.delete(point));
+
+        List<Report> reports = reportRepository.findByMember(findMember);
+        reports.stream().forEach(report -> reportRepository.delete(report));
+
+        List<Review> reviews = reviewRepository.findWithItemByMember(findMember);
+        reviews.stream().forEach(review -> {
+            review.changeStatus();
+        });
+
+        List<Cart> carts = cartRepository.findByMember(findMember);
+        carts.stream().forEach(cart -> cartRepository.delete(cart));
+
+        List<Order> orders = orderRepository.findByMember(findMember);
+        orders.stream().forEach(order -> orderRepository.delete(order));
+
+        List<Item> items = itemRepository.findWithStoreByMember(findMember);
+        items.stream().forEach(item -> {
+            item.getStoreList().stream().forEach(store -> {
+                if(amazonS3Client.doesObjectExist(bucket,store.getFileStoreName())){
+                    amazonS3Client.deleteObject(bucket,store.getFileOriginalName());
+                }
+                storeRepository.delete(store);
+            });
+            item.deleteItem();
+        });
     }
 
     /**
@@ -180,7 +228,7 @@ public class MemberService {
      */
     private void validatePasswordSame(String password1, String password2) {
         if (!password1.equals(password2)) {
-            throw new MemberException("패스워드가 일치하지 않습니다.");
+            throw new MemberException("변경할 비밀번호가 일치하지 않습니다.");
         }
     }
 
@@ -189,7 +237,7 @@ public class MemberService {
      */
     private void validateMemberPasswordSame(String loginPassword, String memberPassword) {
         if (!passwordEncoder.matches(loginPassword, memberPassword)) {
-            throw new MemberException("비밀번호가 일치하지 않습니다.");
+            throw new MemberException("현재 비밀번호가 일치하지 않습니다.");
         }
     }
 

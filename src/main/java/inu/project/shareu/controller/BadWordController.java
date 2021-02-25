@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -37,7 +38,7 @@ public class BadWordController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/badwords", produces = "application/json")
+    @PostMapping(value = "/badwords", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveBadWord(
             @ApiParam(name = "금칙어 등록 요청 모델", value = "금칙어 등록 요청 모델", required = true, type = "body")
             @Valid @RequestBody BadWordSaveRequest badWordSaveRequest) {
@@ -60,7 +61,7 @@ public class BadWordController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping(value = "/badwords/{badWordId}",produces = "application/json")
+    @DeleteMapping(value = "/badwords/{badWordId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteBadWord(@PathVariable Long badWordId) {
 
         badWordService.deleteBadWord(badWordId);
@@ -83,7 +84,7 @@ public class BadWordController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/badwords",produces = "application/json")
+    @GetMapping(value = "/badwords",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<BadWordResponse>> findBadWords(
             @PageableDefault(size = 15,page = 0,sort = "id", direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable) {

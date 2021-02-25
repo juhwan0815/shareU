@@ -10,8 +10,7 @@ import inu.project.shareu.model.member.request.MemberUpdateRequest;
 import inu.project.shareu.model.member.response.MemberAuthResponse;
 import inu.project.shareu.model.member.response.MemberBlockResponse;
 import inu.project.shareu.model.member.response.MemberResponse;
-import inu.project.shareu.service.BadWordService;
-import inu.project.shareu.service.MemberService;
+import inu.project.shareu.service.*;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,12 +37,12 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @ApiOperation(value = "회원가입",notes = "회원 가입")
+    @ApiOperation(value = "회원 가입",notes = "회원 가입")
     @ApiResponses({
             @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/members",produces = "application/json")
+    @PostMapping(value = "/members",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveMember(
             @ApiParam(name = "회원가입 요청 모델",value = "회원가입 요청 모델",required = true,type = "body")
             @RequestBody @Valid MemberSaveRequest memberSaveRequest) {
@@ -58,7 +58,7 @@ public class MemberController {
             @ApiResponse(code = 400, message = "BAD REQUEST",response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PostMapping(value = "/members/login",produces = "application/json")
+    @PostMapping(value = "/members/login",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MemberAuthResponse> loginMember(
             @ApiParam(name = "회원 로그인 요청 모델",value = "회원 로그인 요청 모델",required = true,type = "body")
             @RequestBody @Valid MemberLoginRequest memberLoginRequest) {
@@ -81,7 +81,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping(value = "/members",produces = "application/json")
+    @PatchMapping(value = "/members",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateMember(
             @ApiParam(name = "회원 수정 요청 모델",value = "회원 수정 요청 모델",required = true,type = "body")
             @RequestBody @Valid MemberUpdateRequest memberUpdateRequest){
@@ -105,13 +105,11 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @DeleteMapping(value = "/members",produces = "application/json")
+    @DeleteMapping(value = "/members",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> removeMember(){
 
         Member loginMember = getLoginMember();
         memberService.removeMember(loginMember);
-
-        // TODO 회원 탈퇴시 족보, 구매, 장바구니 등등 모든 엔티티 삭제?
 
         return ResponseEntity.ok().build();
     }
@@ -127,7 +125,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/members",produces = "application/json")
+    @GetMapping(value = "/members",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MemberResponse> findLoginMember(){
 
         Member loginMember = getLoginMember();
@@ -150,7 +148,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @GetMapping(value = "/admin/members",produces = "application/json")
+    @GetMapping(value = "/admin/members",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<MemberBlockResponse>> findBlockMember(
             @PageableDefault(size = 15,sort = "id",direction = Sort.Direction.DESC)
             @ApiIgnore Pageable pageable){
@@ -170,7 +168,7 @@ public class MemberController {
             @ApiResponse(code = 403, message = "FORBIDDEN", response = ExceptionResponse.class),
             @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR", response = ExceptionResponse.class)
     })
-    @PatchMapping(value = "/admin/members/{memberId}",produces = "application/json")
+    @PatchMapping(value = "/admin/members/{memberId}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> changeMemberStatus(@PathVariable Long memberId){
 
         memberService.changeMemberStatus(memberId);

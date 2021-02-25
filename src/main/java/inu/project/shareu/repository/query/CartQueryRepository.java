@@ -30,6 +30,16 @@ public class CartQueryRepository {
                 .fetch();
     }
 
+    public List<Cart> findWithItemByMemberAndCartStatus(Member member, CartStatus cartStatus) {
+        return queryFactory
+                .selectFrom(cart)
+                .join(cart.item, item).fetchJoin()
+                .where(cart.member.eq(member)
+                        .and(cart.cartStatus.eq(cartStatus)))
+                .fetch();
+    }
+
+
     public Page<Cart> findWithItemAndLectureByMemberAndCartStatus(Member member, CartStatus cartStatus,
                                                                   Pageable pageable) {
         List<Cart> content = queryFactory
@@ -49,7 +59,7 @@ public class CartQueryRepository {
                         .and(cart.cartStatus.eq(cartStatus)))
                 .fetchCount();
 
-        return new PageImpl<>(content,pageable,total);
+        return new PageImpl<>(content, pageable, total);
     }
 
 }
